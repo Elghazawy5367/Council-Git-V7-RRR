@@ -2,6 +2,7 @@ import React, { useState, useCallback, lazy, Suspense } from 'react';
 import { useExpertStore } from '@/features/council/store/expert-store';
 import { useControlPanelStore } from '@/features/council/store/control-panel-store';
 import { KnowledgeFile, Expert } from '@/features/council/lib/types';
+import { pluginManager } from '@/lib/plugin-manager';
 import { SafeMarkdown } from '@/components/primitives/SafeMarkdown';
 import { MAGNIFICENT_7_FLEET } from '@/lib/config';
 import { EXPERT_POSITIONS, PERSONA_LIBRARY } from '@/lib/persona-library';
@@ -280,71 +281,79 @@ export const ExpertCard: React.FC<ExpertCardProps> = ({ index }) => {
             )}
           </div>
 
-          <Collapsible open={isConfigOpen} onOpenChange={setIsConfigOpen} className="flex-shrink-0">
-            <CollapsibleTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="w-full justify-between h-7 px-2 hover:bg-muted/50"
-              >
-                <span className="flex items-center gap-1.5 text-[10px] font-medium text-muted-foreground">
-                  <Settings2 className="h-3 w-3" />
-                  Config
-                </span>
-                {isConfigOpen ? (
-                  <ChevronUp className="h-3 w-3" />
+            <Collapsible open={isConfigOpen} onOpenChange={setIsConfigOpen} className="flex-shrink-0">
+              <CollapsibleTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="w-full justify-between h-7 px-2 hover:bg-muted/50"
+                >
+                  <span className="flex items-center gap-1.5 text-[10px] font-medium text-muted-foreground">
+                    <Settings2 className="h-3 w-3" />
+                    Config
+                  </span>
+                  {isConfigOpen ? (
+                    <ChevronUp className="h-3 w-3" />
+                  ) : (
+                    <ChevronDown className="h-3 w-3" />
+                  )}
+                </Button>
+              </CollapsibleTrigger>
+              <CollapsibleContent className="space-y-3 pt-2">
+                {expert.pluginId && pluginManager.getExpertPlugin(expert.pluginId) ? (
+                  pluginManager.getExpertPlugin(expert.pluginId)?.renderConfig(expert.pluginConfig || {}, (newCfg) => {
+                    updateExpert(index, { ...expert, pluginConfig: newCfg });
+                  })
                 ) : (
-                  <ChevronDown className="h-3 w-3" />
+                  <>
+                    <div className="space-y-1">
+                      <div className="flex justify-between text-[10px]">
+                        <span className="text-muted-foreground">Temp</span>
+                        <span className="font-mono">{expert.config.temperature.toFixed(2)}</span>
+                      </div>
+                      <Slider
+                        value={[expert.config.temperature]}
+                        onValueChange={([value]) => handleConfigChange('temperature', value)}
+                        min={0}
+                        max={2}
+                        step={0.1}
+                        className="slider-council"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <div className="flex justify-between text-[10px]">
+                        <span className="text-muted-foreground">Top P</span>
+                        <span className="font-mono">{expert.config.topP.toFixed(2)}</span>
+                      </div>
+                      <Slider
+                        value={[expert.config.topP]}
+                        onValueChange={([value]) => handleConfigChange('topP', value)}
+                        min={0}
+                        max={1}
+                        step={0.05}
+                        className="slider-council"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <div className="flex justify-between text-[10px]">
+                        <span className="text-muted-foreground">Max Tokens</span>
+                        <span className="font-mono">{expert.config.maxTokens}</span>
+                      </div>
+                      <Slider
+                        value={[expert.config.maxTokens]}
+                        onValueChange={([value]) => handleConfigChange('maxTokens', value)}
+                        min={1000}
+                        max={8000}
+                        step={500}
+                        className="slider-council"
+                      />
+                    </div>
+                  </>
                 )}
-              </Button>
-            </CollapsibleTrigger>
-            <CollapsibleContent className="space-y-3 pt-2">
-              <div className="space-y-1">
-                <div className="flex justify-between text-[10px]">
-                  <span className="text-muted-foreground">Temp</span>
-                  <span className="font-mono">{expert.config.temperature.toFixed(2)}</span>
-                </div>
-                <Slider
-                  value={[expert.config.temperature]}
-                  onValueChange={([value]) => handleConfigChange('temperature', value)}
-                  min={0}
-                  max={2}
-                  step={0.1}
-                  className="slider-council"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <div className="flex justify-between text-[10px]">
-                  <span className="text-muted-foreground">Top P</span>
-                  <span className="font-mono">{expert.config.topP.toFixed(2)}</span>
-                </div>
-                <Slider
-                  value={[expert.config.topP]}
-                  onValueChange={([value]) => handleConfigChange('topP', value)}
-                  min={0}
-                  max={1}
-                  step={0.05}
-                  className="slider-council"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <div className="flex justify-between text-[10px]">
-                  <span className="text-muted-foreground">Max Tokens</span>
-                  <span className="font-mono">{expert.config.maxTokens}</span>
-                </div>
-                <Slider
-                  value={[expert.config.maxTokens]}
-                  onValueChange={([value]) => handleConfigChange('maxTokens', value)}
-                  min={1000}
-                  max={8000}
-                  step={500}
-                  className="slider-council"
-                />
-              </div>
-            </CollapsibleContent>
-          </Collapsible>
+              </CollapsibleContent>
+            </Collapsible>
 
           {isEditing && (
             <div className="space-y-2 pt-2 border-t border-border/50 flex-shrink-0">

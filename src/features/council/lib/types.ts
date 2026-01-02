@@ -40,6 +40,8 @@ export interface Expert {
   hasWebSearch?: boolean;
   positionName?: string;
   positionSpecialty?: string;
+  pluginId?: string;
+  pluginConfig?: any;
 }
 
 export type ExecutionMode = 'separated' | 'synthesis' | 'debate' | 'pipeline';
