@@ -1,4 +1,4 @@
-import { get, set, del, clear } from 'idb-keyval';
+import { get, set, clear } from 'idb-keyval';
 import type { Expert, SynthesisConfig, CouncilSession, ExecutionMode } from './types';
 
 // IndexedDB keys
@@ -153,7 +153,8 @@ export async function saveAppState(state: PersistedAppState): Promise<void> {
  */
 export async function loadAppState(): Promise<PersistedAppState | null> {
   try {
-    return await get<PersistedAppState>(KEYS.APP_STATE);
+    const state = await get<PersistedAppState>(KEYS.APP_STATE);
+    return state || null;
   } catch (error) {
     console.error('Failed to load app state:', error);
     return null;
