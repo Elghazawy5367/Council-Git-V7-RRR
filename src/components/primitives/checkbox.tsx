@@ -30,4 +30,3 @@ const Component = () => {
   return <div>Checkbox Component</div>;
 };
 
-export default Component;

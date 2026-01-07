@@ -12,4 +12,3 @@ const Component = () => {
   return <div>Skeleton Component</div>;
 };
 
-export default Component;

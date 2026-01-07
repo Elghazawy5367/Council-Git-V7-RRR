@@ -42,4 +42,3 @@ const Component = () => {
 
 export { Avatar, AvatarImage, AvatarFallback };
 
-export default Component;

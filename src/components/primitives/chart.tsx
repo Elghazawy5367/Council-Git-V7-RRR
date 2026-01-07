@@ -306,4 +306,3 @@ const Component = () => {
 
 export { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent, ChartStyle };
 
-export default Component;

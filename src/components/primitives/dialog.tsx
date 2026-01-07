@@ -99,4 +99,3 @@ export {
   DialogDescription,
 };
 
-export default Component;

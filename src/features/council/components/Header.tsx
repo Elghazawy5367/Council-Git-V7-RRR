@@ -8,21 +8,13 @@ import { Badge } from '@/components/primitives/badge';
 import { MemoryBadge } from './MemoryBadge';
 
 export const Header: React.FC = () => {
-  const { cost } = useExecutionStore((state) => ({ cost: state.cost }));
-  const {
-    vaultStatus,
-    setShowSettings,
-    showHistory,
-    setShowHistory,
-    setShowMemory, // Removed unused __showMemory
-  } = useSettingsStore((state) => ({
-    vaultStatus: state.vaultStatus,
-    setShowSettings: state.setShowSettings,
-    showHistory: state.showHistory,
-    setShowHistory: state.setShowHistory,
-    setShowMemory: state.setShowMemory,
-  }));
-  const { memory } = useMemoryStore((state) => ({ memory: state.memory }));
+  const cost = useExecutionStore(state => state.cost);
+  const vaultStatus = useSettingsStore(state => state.vaultStatus);
+  const setShowSettings = useSettingsStore(state => state.setShowSettings);
+  const showHistory = useSettingsStore(state => state.showHistory);
+  const setShowHistory = useSettingsStore(state => state.setShowHistory);
+  const setShowMemory = useSettingsStore(state => state.setShowMemory);
+  const memory = useMemoryStore(state => state.memory);
 
   const memoryCount = memory?.entries.length || 0;
 

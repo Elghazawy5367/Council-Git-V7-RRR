@@ -181,4 +181,3 @@ export {
   ContextMenuRadioGroup,
 };
 
-export default Component;

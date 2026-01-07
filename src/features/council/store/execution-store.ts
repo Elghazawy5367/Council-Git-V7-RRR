@@ -1,13 +1,15 @@
 import { create } from 'zustand';
 import { toast } from 'sonner';
 import { SynthesisResult, SynthesisConfig } from '@/features/council/lib/types';
-import { useControlPanelStore } from './control-panel-store';
-import { useExpertStore } from './expert-store';
-import { useSettingsStore } from '@/features/settings/store/settings-store';
 import { callExpertStreaming } from '@/features/council/api/ai-client';
-import { SYNTHESIS_TIERS } from '@/lib/synthesis-engine';
+// import { SYNTHESIS_TIERS } from '@/lib/synthesis-engine'; // Unused import commented out
 import { saveSession } from '@/features/council/lib/session-history';
 import { UseMutationResult } from '@tanstack/react-query';
+
+// Async imports to break circular dependencies
+const getControlPanelStore = () => import('./control-panel-store').then(mod => mod.useControlPanelStore);
+const getExpertStore = () => import('./expert-store').then(mod => mod.useExpertStore);
+const getSettingsStore = () => import('@/features/settings/store/settings-store').then(mod => mod.useSettingsStore);
 
 export interface ExpertOutput {
   name: string;
@@ -29,7 +31,7 @@ interface ExecutionState {
   outputs: Record<string, string>;
   synthesisResult: SynthesisResult | null;
   verdict: string;
-  status: string; // Added to represent the execution status
+  status: string;
   executeCouncil: (synthesisMutation: UseMutationResult<SynthesisResult, Error, { expertOutputs: ExpertOutput[]; task: string; config: SynthesisConfig; apiKey: string; onProgress: (message: string) => void; }, unknown>) => Promise<void>;
   reset: () => void;
 }
@@ -45,99 +47,147 @@ export const useExecutionStore = create<ExecutionState>((set) => ({
   status: '',
 
   executeCouncil: async (synthesisMutation) => {
-    const { task, mode, activeExpertCount } = useControlPanelStore.getState();
-    const { experts, updateExpert } = useExpertStore.getState();
-    const { openRouterKey } = useSettingsStore.getState();
+    // Use async imports to prevent circular dependencies
+    try {
+      const controlPanelStore = await getControlPanelStore();
+      const expertStore = await getExpertStore();
+      const settingsStore = await getSettingsStore();
+      
+      const { task, mode, activeExpertCount } = controlPanelStore.getState();
+      const { experts, updateExpert } = expertStore.getState();
+      const { openRouterKey } = settingsStore.getState();
 
-    if (!openRouterKey) {
-      toast.error('Vault Locked', {
-        action: { label: 'Unlock', onClick: () => useSettingsStore.getState().setShowSettings(true) },
-      });
-      return;
-    }
-    if (!task.trim()) {
-      toast.error('Task is empty');
-      return;
-    }
-
-    set({ 
-      isLoading: true, 
-      outputs: {}, 
-      synthesisResult: null, 
-      verdict: '', 
-      cost: { experts: 0, synthesis: 0, total: 0 },
-      statusMessage: 'Initializing Council...' 
-    });
-
-    const activeExperts = experts.slice(0, activeExpertCount);
-    const collectedOutputs: Record<string, { expertName: string; output: string; model: string }> = {};
-    let expertsCost = 0;
-
-    for (let i = 0; i < activeExperts.length; i++) {
-      const expert = activeExperts[i];
-      set({ statusMessage: `${expert.name} is analyzing...` });
-      updateExpert(i, { ...expert, isLoading: true, output: '' });
-
-      const previousOutputs = mode === 'pipeline' || mode === 'debate' ? Object.fromEntries(Object.entries(collectedOutputs).map(([id, data]) => [id, data.output])) : undefined;
-
-      try {
-        const result = await callExpertStreaming(
-          expert,
-          task,
-          mode,
-          openRouterKey,
-          {
-            onToken: (token) => {
-              const currentExpert = useExpertStore.getState().experts[i];
-              updateExpert(i, { ...currentExpert, output: currentExpert.output + token });
-              set(state => ({ outputs: { ...state.outputs, [expert.id]: (state.outputs[expert.id] || '') + token }}));
-            },
-            onComplete: (fullText) => {
-              collectedOutputs[expert.id] = { expertName: expert.name, output: fullText, model: expert.model };
-            },
-            onError: (error) => {
-              toast.error(`${expert.name} Failed`, { description: error.message });
-            },
-          },
-          undefined,
-          previousOutputs
-        );
-        expertsCost += result.cost;
-        set(state => ({ cost: { ...state.cost, experts: expertsCost, total: expertsCost + state.cost.synthesis }}));
-      } catch (error: unknown) {
-        const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-        const errorOutput = `⚠️ Error: ${errorMessage}`;
-        set(state => ({ outputs: { ...state.outputs, [expert.id]: errorOutput }}));
-        collectedOutputs[expert.id] = { expertName: expert.name, output: errorOutput, model: expert.model };
+      if (!openRouterKey) {
+        toast.error('Vault Locked', {
+          action: { label: 'Unlock', onClick: () => settingsStore.getState().setShowSettings(true) },
+        });
+        return;
+      }
+      if (!task.trim()) {
+        toast.error('Task is empty');
+        return;
       }
 
-      updateExpert(i, { ...useExpertStore.getState().experts[i], isLoading: false });
-    }
+      set({ 
+        isLoading: true, 
+        outputs: {}, 
+        synthesisResult: null, 
+        verdict: '', 
+        cost: { experts: 0, synthesis: 0, total: 0 },
+        statusMessage: 'Initializing Council...' 
+      });
 
-    if (Object.keys(collectedOutputs).length > 0) {
-      set({ isSynthesizing: true });
-      const synthesisConfig = useSettingsStore.getState().synthesisConfig;
-      const tierConfig = SYNTHESIS_TIERS[synthesisConfig.tier];
-      set({ statusMessage: `${tierConfig.icon} Running ${tierConfig.name}...`});
+      const activeExperts = experts.slice(0, activeExpertCount);
+      const collectedOutputs: Record<string, { expertName: string; output: string; model: string }> = {};
+      let expertsCost = 0;
 
-      const expertOutputsForSynthesis = Object.values(collectedOutputs).map((data) => ({
-        name: data.expertName,
-        model: data.model,
-        content: data.output,
-      }));
+      for (let i = 0; i < activeExperts.length; i++) {
+        const expert = activeExperts[i];
+        set({ statusMessage: `${expert.name} is analyzing...` });
+        
+        // Use async store updates to prevent render loops
+        requestAnimationFrame(() => {
+          updateExpert(i, { ...expert, isLoading: true, output: '' });
+        });
 
+        const previousOutputs = mode === 'pipeline' || mode === 'debate' ? Object.fromEntries(Object.entries(collectedOutputs).map(([id, data]) => [id, data.output])) : undefined;
+
+        try {
+          // Capture the content from streaming callbacks
+          let finalContent = '';
+          
+          const result = await callExpertStreaming(
+            expert,
+            task,
+            mode,
+            openRouterKey,
+            {
+              onToken: (token) => {
+                // CRITICAL: Never use requestAnimationFrame in streaming callbacks
+                // This causes infinite loops when combined with state updates
+                // Use microtask queue (Promise) for non-blocking updates instead
+                Promise.resolve().then(() => {
+                  getExpertStore().then(useExpertStoreHook => {
+                    const state = useExpertStoreHook.getState();
+                    const currentExpert = state.experts[i];
+                    if (currentExpert) {
+                      state.updateExpert(i, { ...currentExpert, output: (currentExpert.output || '') + token });
+                    }
+                  }).catch(err => console.error('Error updating expert on token:', err));
+                });
+              },
+              onComplete: (fullText) => {
+                finalContent = fullText;
+              },
+              onError: (error) => {
+                console.error(`Streaming error for expert ${expert.name}:`, error);
+              }
+            },
+            undefined, // additionalContext
+            previousOutputs // previousOutputs
+          );
+
+          collectedOutputs[expert.id] = { expertName: expert.name, output: finalContent, model: expert.model };
+          expertsCost += result.cost;
+          
+          // Update expert with final result - use synchronous store update
+          getExpertStore().then(useExpertStoreHook => {
+            const state = useExpertStoreHook.getState();
+            const updatedExpert = state.experts[i];
+            if (updatedExpert) {
+              state.updateExpert(i, { ...updatedExpert, output: finalContent, isLoading: false });
+            }
+          }).catch(err => console.error('Error updating expert final output:', err));
+
+          set((state) => ({
+            outputs: { ...state.outputs, [expert.id]: finalContent },
+            cost: { ...state.cost, experts: expertsCost, total: expertsCost + state.cost.synthesis },
+          }));
+        } catch (error) {
+          console.error(`Error with expert ${expert.name}:`, error);
+          
+          // Update expert error state - avoid requestAnimationFrame to prevent infinite loops
+          getExpertStore().then(useExpertStoreHook => {
+            const state = useExpertStoreHook.getState();
+            const failedExpert = state.experts[i];
+            if (failedExpert) {
+              state.updateExpert(i, { ...failedExpert, output: 'Failed to generate output.', isLoading: false });
+            }
+          }).catch(err => console.error('Error updating expert on failure:', err));
+
+          set((state) => ({
+            outputs: { ...state.outputs, [expert.id]: 'Failed to generate output.' },
+          }));
+        }
+      }
+
+      // Synthesis phase
+      const { synthesisConfig } = settingsStore.getState();
+      
+      set({ statusMessage: 'Synthesizing insights...', isSynthesizing: true });
+      
       synthesisMutation.mutate(
         {
-          expertOutputs: expertOutputsForSynthesis,
+          expertOutputs: Object.values(collectedOutputs).map(data => ({
+            name: data.expertName,
+            model: data.model,
+            content: data.output,
+          })),
           task,
           config: synthesisConfig,
           apiKey: openRouterKey,
-          onProgress: (message) => set({ statusMessage: message }),
+          onProgress: (message: string) => {
+            set({ statusMessage: message });
+          },
         },
         {
           onSuccess: (result) => {
-            set({ synthesisResult: result, verdict: result.content });
             const newSynthesisCost = result.cost;
+            set({ 
+              synthesisResult: result, 
+              verdict: result.content,
+              statusMessage: 'Analysis complete'
+            });
             set(() => ({
               cost: { experts: expertsCost, synthesis: newSynthesisCost, total: expertsCost + newSynthesisCost },
             }));
@@ -161,9 +211,13 @@ export const useExecutionStore = create<ExecutionState>((set) => ({
           },
         }
       );
-    }
 
-    set({ isLoading: false, statusMessage: '' });
+      set({ isLoading: false, statusMessage: '' });
+    } catch (error) {
+      console.error('ExecuteCouncil error:', error);
+      set({ isLoading: false, statusMessage: '' });
+      toast.error('Failed to execute council');
+    }
   },
 
   reset: () => {

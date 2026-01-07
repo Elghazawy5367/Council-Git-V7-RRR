@@ -13,4 +13,3 @@ const Component = () => {
   return <div>Collapsible Component</div>;
 };
 
-export default Component;

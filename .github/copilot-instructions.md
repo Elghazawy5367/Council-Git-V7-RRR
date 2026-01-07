@@ -1,16 +1,17 @@
-# [# The Council - Copilot Instructions
+# The Council - Copilot Instructions
 
-**The Council** is a React + TypeScript AI orchestration app that queries multiple AI models via OpenRouter and synthesizes their outputs. Built for a solo founder on a Samsung tablet with zero infrastructure costs.
+**The Council** is a React + TypeScript AI orchestration app that queries multiple AI models via OpenRouter and synthesizes their outputs. Built for a solo founder with zero infrastructure costs and includes advanced intelligence/research capabilities.
 
 ## Architecture Overview
 
 ### Tech Stack
 - **Frontend**: React 18 + TypeScript 5.8 + Vite 6
 - **State**: Zustand stores (feature-based)
-- **Storage**: Dexie (IndexedDB wrapper)
+- **Storage**: Dexie (IndexedDB wrapper) + idb-keyval
 - **UI**: Radix UI primitives + Tailwind CSS + shadcn/ui
 - **AI**: OpenRouter API (usage-based)
 - **Routing**: React Router v6
+- **Intelligence**: Scout system for GitHub research, Mirror for code quality analysis
 
 ### Feature Organization
 ```
@@ -20,7 +21,7 @@ src/
 │   │   ├── api/          # ai-client.ts (OpenRouter integration)
 │   │   ├── components/   # ExpertCard, SynthesisCard, etc.
 │   │   ├── hooks/        # useExecuteSynthesis, etc.
-│   │   ├── lib/          # types.ts, synthesis logic
+│   │   ├── lib/          # types.ts, synthesis logic, persona-library.ts
 │   │   └── store/        # Zustand stores (expert, execution, memory)
 │   └── settings/         # API key management, synthesis config
 ├── components/
@@ -29,7 +30,16 @@ src/
 ├── lib/
 │   ├── db.ts            # Dexie schema + migrations
 │   ├── synthesis-engine.ts # Multi-tier synthesis strategies
-│   └── config.ts        # System prompts, model configurations
+│   ├── config.ts        # System prompts, model configurations
+│   ├── scout.ts         # GitHub intelligence extraction system
+│   ├── plugin-manager.ts # Extensible plugin architecture
+│   └── report-generator.ts # Intelligence reporting
+├── plugins/
+│   └── core-ai-expert/  # Plugin system for extensible expert types
+├── scripts/
+│   ├── run-mirror.ts    # Code quality analysis tool
+│   ├── quality-pipeline.ts # Automated quality improvement
+│   └── validate-architecture.ts # Architecture compliance checking
 └── pages/
     └── Index.tsx        # Main Council interface
 ```
@@ -50,7 +60,12 @@ export const useExpertStore = create<ExpertState>((set) => ({
 - `useExecutionStore` - Tracks synthesis execution state
 - `useControlPanelStore` - UI state (active expert count, execution mode)
 - `useSettingsStore` - API keys, synthesis config (persisted to localStorage)
-- `useMemoryStore` - Session history and memory
+- `useMemoryStore` - Cross-session persistent memory (IndexedDB via idb-keyval)
+
+**Persona Library**: [src/features/council/lib/persona-library.ts](src/features/council/lib/persona-library.ts)
+- 7 pre-configured expert personas (Blue Ocean Strategist, Ruthless Validator, etc.)
+- Team presets for common workflows (Opportunity Discovery, Idea Validation)
+- Framework-based experts with specific methodologies (ERRC Grid, Mom Test, Bullseye Framework)
 
 ## Critical Patterns
 
@@ -114,6 +129,24 @@ const SettingsModal = lazy(() => import("@/features/settings/components/Settings
 
 Used for modals and sidebars to reduce initial bundle size (<2MB target).
 
+### 6. Plugin Architecture
+**Files**: [src/lib/plugin-manager.ts](src/lib/plugin-manager.ts), [src/plugins/](src/plugins/)
+
+Extensible expert system using plugin pattern:
+- Expert plugins implement `ExpertPlugin` interface with `renderConfig`, `execute`, `validateConfig`
+- Plugin manager handles registration and lifecycle
+- Enables adding new expert types without modifying core code
+
+```typescript
+// Register new expert plugin
+const myPlugin: ExpertPlugin = {
+  id: 'my-expert',
+  renderConfig: (config, onChange) => /* React component */,
+  execute: async (input, config) => /* AI processing */
+};
+pluginManager.registerExpertPlugin(myPlugin);
+```
+
 ## Development Workflow
 
 ### Commands
@@ -135,6 +168,42 @@ npm run build      # Production build
 - All functions must have explicit return types
 - API responses validated with Zod (see `@features/council/lib/types.ts`)
 
+### Council Memory System
+**File**: [src/features/council/lib/council-memory.ts](src/features/council/lib/council-memory.ts)
+- Cross-session persistent memory using idb-keyval
+- Stores insights, patterns, user preferences, domain knowledge
+- Automatic relevance scoring and pruning (max 100 entries)
+- Memory types: `insight`, `pattern`, `user_preference`, `domain_knowledge`
+
+### Intelligence & Quality Tools
+**Scout System**: [src/lib/scout.ts](src/lib/scout.ts)
+- GitHub intelligence extraction for market research
+- Blue Ocean opportunity discovery via repository analysis
+- Commands: `npm run scout`, `npm run scout:blue-ocean`
+- Returns: Pain points, product opportunities, emerging trends
+
+**Mirror System**: [scripts/run-mirror.ts](scripts/run-mirror.ts)
+- Code quality analysis against elite repository standards
+- Generates markdown reports with gaps and suggestions
+- Commands: `npm run mirror`, `npm run quality`
+
+**Self-Improve System**: [src/lib/self-improve.ts](src/lib/self-improve.ts)
+- Learns patterns from successful GitHub repositories
+- Extracts positioning, pricing, features, and architecture patterns
+- Generates high-confidence patterns with evidence
+- Automatically updates knowledge base markdown files
+
+**Quality Pipeline**: [scripts/quality-pipeline.ts](scripts/quality-pipeline.ts)
+- Combines Code Mirror + Self-Improve for automated quality enhancement
+- Analyzes gaps and learns patterns in one workflow
+- Can auto-apply fixes and generate PRs
+- Commands: `npm run quality` (mirror + improve), `npm run improve` (pipeline only)
+
+**Architecture Validation**: [scripts/validate-architecture.ts](scripts/validate-architecture.ts)
+- Enforces feature isolation (no cross-feature imports)
+- Detects `any` types and architectural violations
+- Plugin system compliance checking
+
 ### Constraints (Tablet-First)
 - **No Docker** - dev container for cloud environments only
 - **Vite only** - fast, lightweight, SWC for transpilation
@@ -152,6 +221,47 @@ npm run build      # Production build
 - **Tables**: `experts`, `sessions`
 - **Initialization**: Call `initDatabase()` on app start
 - **Schema changes**: Always use versioned migrations in db.ts
+
+### Council Memory System
+**File**: [src/features/council/lib/council-memory.ts](src/features/council/lib/council-memory.ts)
+- Cross-session persistent memory using idb-keyval
+- Stores insights, patterns, user preferences, domain knowledge
+- Automatic relevance scoring and pruning (max 100 entries)
+- Memory types: `insight`, `pattern`, `user_preference`, `domain_knowledge`
+
+## Intelligence System Workflows
+
+### Code Quality Analysis (Mirror)
+```bash
+npm run mirror  # Analyze codebase, generate markdown report
+```
+**Output**: Compares code against elite repo standards, identifies gaps with severity levels
+**Typical findings**: Missing error handling, unsafe type usage, performance anti-patterns
+**Integration**: Results feed into quality pipeline for improvement recommendations
+
+### GitHub Market Research (Scout)
+```bash
+npm run scout                    # Full intelligence scan
+npm run scout:blue-ocean         # Find abandoned goldmines
+npm run scout:report             # Generate actionable report
+```
+**Output**: Pain points clustered by category, product opportunities ranked by impact/effort ratio, emerging trends
+**Data stored**: `data/opportunities/latest.json`, `data/reports/`, `data/intelligence/`
+
+### Self-Improvement Learning
+```bash
+npm run learn                    # Analyze successful repositories
+```
+**Output**: High-confidence success patterns with evidence, updates to `src/lib/knowledge-base/`
+**Knowledge updated**: positioning, pricing, features, architecture patterns from successful projects
+
+### Full Quality Pipeline
+```bash
+npm run quality    # Mirror + Learn in one flow (recommended)
+npm run improve    # Just the learning/fix generation phase
+```
+**Workflow**: Analyze current code → Learn from elite repos → Cross-reference findings → Generate PR with fixes
+**Output**: Quality report + improvement recommendations + optional PR template
 
 ## Common Tasks
 
@@ -173,11 +283,24 @@ npm run build      # Production build
 3. Use `class-variance-authority` for variants
 4. Export from primitives directory
 
+### Adding a New Expert Plugin
+1. Create plugin directory in [src/plugins/](src/plugins/)
+2. Implement `ExpertPlugin` interface with required methods
+3. Register plugin via `pluginManager.registerExpertPlugin()`
+4. Add config component for plugin-specific settings
+
+### Running Intelligence Analysis
+
+See "Intelligence System Workflows" above for detailed command reference.
+
 ## Important Files to Reference
 
-- **[src/lib/config.ts](src/lib/config.ts)** - Model configurations, system prompts
+- **[src/lib/config.ts](src/lib/config.ts)** - Model configurations, system prompts, execution modes
 - **[src/lib/types.ts](src/lib/types.ts)** - Global type definitions (SynthesisConfig, etc.)
 - **[src/features/council/lib/types.ts](src/features/council/lib/types.ts)** - Council-specific types (Expert, ModeBehavior)
+- **[src/features/council/lib/persona-library.ts](src/features/council/lib/persona-library.ts)** - Pre-configured expert personas and teams
+- **[src/lib/scout.ts](src/lib/scout.ts)** - GitHub intelligence extraction and opportunity discovery
+- **[src/lib/plugin-manager.ts](src/lib/plugin-manager.ts)** - Plugin system architecture
 - **[src/pages/Index.tsx](src/pages/Index.tsx)** - Main UI layout and grid logic
 
 ## Conventions
@@ -196,8 +319,52 @@ npm run build      # Production build
 - **Offline-capable** - IndexedDB for persistence, works without network
 - **Solo-maintainable** - Clear patterns, minimal abstractions
 
+## Quality Workflow
+
+**Before major changes:**
+1. Run `npm run typecheck` to verify TypeScript compliance
+2. Run `npm run lint` to check code quality (watch for `any` types)
+3. Run `npm run quality` for architecture validation
+4. Use `scripts/validate-architecture.ts` for feature isolation compliance
+
+**Error Resolution Pattern:**
+- TypeScript errors block commits (strict mode)
+- Fix `any` types immediately (architectural requirement)
+- Plugin system prevents tight coupling between features
+- Use incremental migration patterns for safe refactoring
+
+## Recent Additions (Jan 7, 2026)
+
+### Intelligence Systems
+**Code Mirror** - Analyzes code quality against elite repository standards
+**Scout** - GitHub intelligence extraction for market research and Blue Ocean opportunities
+**Self-Improve** - Learns patterns from successful repositories in any niche
+**Quality Pipeline** - Combines Mirror analysis with Self-Improving for automated improvements
+
+These systems enable the Council to improve its own decision-making by analyzing what works in the broader ecosystem.
+
+## Critical Gotchas
+
+**Database Migrations**: If you modify any data structure used by Dexie stores:
+1. Never mutate existing version numbers
+2. Create a new `.version(N+1)` entry
+3. Provide an `.upgrade()` function to migrate old data
+4. Test migrations against both empty and populated databases
+
+**TypeScript Strict Mode**: The app enforces `strict: true`. Common violations:
+- Using `any` anywhere (this will fail CI) - use `unknown` instead
+- Missing return types on exported functions
+- Unhandled null/undefined in optional chains
+
+**Feature Isolation**: Strictly no cross-feature imports except:
+- Shared types from `@/lib/types.ts`
+- Global utilities from `@/lib/utils.ts`
+- Violating this triggers architecture validation errors
+
+**Store Initialization**: Always call `initDatabase()` in `main.tsx` on app startup before rendering. The Dexie database won't work correctly without this.
+
 ---
 
-**Last Updated**: January 6, 2026  
-**For questions on patterns**: Check existing implementation in `src/features/council/` before creating new patterns.
-]
+**Last Updated**: January 7, 2026  
+**For questions on patterns**: Check existing implementation in `src/features/council/` before creating new patterns.  
+**Need to add something?**: Ask yourself: "Does this already exist in `src/features/council/`?" If yes, reuse it. If no, follow the patterns exactly.

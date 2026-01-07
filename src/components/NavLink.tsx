@@ -26,10 +26,4 @@ const NavLink = forwardRef<HTMLAnchorElement, NavLinkCompatProps>(
 NavLink.displayName = "NavLink";
 
 export { NavLink };
-
-const Component = () => {
-  // Placeholder for the correct component
-  return <a>NavLink Component</a>;
-};
-
-export default Component;
+export default NavLink;

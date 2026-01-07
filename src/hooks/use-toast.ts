@@ -126,10 +126,17 @@ const listeners: Array<(state: State) => void> = [];
 let memoryState: State = { toasts: [] };
 
 function dispatch(action: Action) {
-  memoryState = reducer(memoryState, action);
-  listeners.forEach((listener) => {
-    listener(memoryState);
-  });
+  const newState = reducer(memoryState, action);
+  if (newState !== memoryState) {
+    memoryState = newState;
+    listeners.forEach((listener) => {
+      try {
+        listener(memoryState);
+      } catch (error) {
+        console.error("Error in listener:", error);
+      }
+    });
+  }
 }
 
 type Toast = Omit<ToasterToast, "id">;
@@ -174,7 +181,7 @@ function useToast() {
         listeners.splice(index, 1);
       }
     };
-  }, [state]);
+  }, []); // Fixed: removed 'state' from dependencies to prevent infinite loop
 
   return {
     ...state,

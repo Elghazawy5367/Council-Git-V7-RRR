@@ -91,4 +91,3 @@ export {
   DrawerDescription,
 };
 
-export default Component;

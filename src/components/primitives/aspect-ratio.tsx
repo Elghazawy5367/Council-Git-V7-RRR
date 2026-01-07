@@ -8,4 +8,3 @@ const Component = () => {
   return <div>Aspect Ratio Component</div>;
 };
 
-export default Component;

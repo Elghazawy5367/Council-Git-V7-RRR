@@ -51,33 +51,31 @@ interface ExpertCardProps {
 }
 
 export const ExpertCard: React.FC<ExpertCardProps> = ({ index }) => {
-  const expert = useExpertStore((state) => state.experts[index]);
-  const { updateExpert, addKnowledge, removeKnowledge } = useExpertStore((state) => ({ updateExpert: state.updateExpert, addKnowledge: state.addKnowledge, removeKnowledge: state.removeKnowledge }));
-  const { activeExpertCount, clearPersona } = useControlPanelStore((state) => ({ activeExpertCount: state.activeExpertCount, clearPersona: state.clearPersona }));
+  const expert = useExpertStore(state => state.experts[index]);
+  const updateExpert = useExpertStore(state => state.updateExpert);
+  const addKnowledge = useExpertStore(state => state.addKnowledge);
+  const removeKnowledge = useExpertStore(state => state.removeKnowledge);
+  const activeExpertCount = useControlPanelStore(state => state.activeExpertCount);
+  const clearPersona = useControlPanelStore(state => state.clearPersona);
   const isActive = index < activeExpertCount;
 
   const [isConfigOpen, setIsConfigOpen] = useState<boolean>(false);
   const [isEditing, setIsEditing] = useState<boolean>(false);
-  const [editedPersona, setEditedPersona] = useState<string | undefined>(expert.basePersona);
+  const [editedPersona, setEditedPersona] = useState<string | undefined>();
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
 
-  const IconComponent = ICON_MAP[expert.icon] || Brain;
-  const selectedModel = MAGNIFICENT_7_FLEET.find((m) => m.id === expert.model);
-  
-  const positionInfo = EXPERT_POSITIONS[index] || EXPERT_POSITIONS[0];
-  const positionName = expert.positionName || positionInfo.position;
-  
-  const loadedPersona = expert.personaId ? PERSONA_LIBRARY[expert.personaId] : null;
+  // Sync editedPersona with expert.basePersona only when expert changes, not on every render
+  React.useEffect(() => {
+    if (expert?.basePersona !== editedPersona) {
+      setEditedPersona(expert?.basePersona);
+    }
+  }, [expert?.basePersona]); // Only depend on basePersona, not editedPersona to avoid loops
 
+  // Define all hooks BEFORE any early returns
   const handleRetry = useCallback(() => {
     // Will be implemented later
-    toast.info(`Retrying ${expert.name}...`);
-  }, [expert.name]);
-
-  const handleClearPersonaClick = () => {
-    clearPersona(index);
-    toast.success(`${positionName} reset to default`);
-  };
+    toast.info(`Retrying ${expert?.name}...`);
+  }, [expert?.name]);
 
   const handleFileUpload = useCallback(
     async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -126,6 +124,28 @@ export const ExpertCard: React.FC<ExpertCardProps> = ({ index }) => {
     updateExpert(index, { ...expert, basePersona: editedPersona });
     setIsEditing(false);
     toast.success('Persona updated');
+  };
+
+  // Prevent render if expert is undefined (prevents crashes during state updates)
+  if (!expert) {
+    return (
+      <Card className="glass-panel h-96 flex items-center justify-center">
+        <div className="text-muted-foreground text-sm">Loading expert...</div>
+      </Card>
+    );
+  }
+
+  const IconComponent = ICON_MAP[expert.icon] || Brain;
+  const selectedModel = MAGNIFICENT_7_FLEET.find((m) => m.id === expert.model);
+  
+  const positionInfo = EXPERT_POSITIONS[index] || EXPERT_POSITIONS[0];
+  const positionName = expert.positionName || positionInfo.position;
+  
+  const loadedPersona = expert.personaId ? PERSONA_LIBRARY[expert.personaId] : null;
+
+  const handleClearPersonaClick = () => {
+    clearPersona(index);
+    toast.success(`${positionName} reset to default`);
   };
 
   return (

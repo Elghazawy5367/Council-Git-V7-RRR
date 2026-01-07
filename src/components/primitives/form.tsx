@@ -47,4 +47,3 @@ const Component = () => {
   return <div>Form Component</div>;
 };
 
-export default Component;

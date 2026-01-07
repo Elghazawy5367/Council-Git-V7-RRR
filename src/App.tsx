@@ -8,6 +8,7 @@ import { Toaster } from "@/components/primitives/sonner";
 
 // Lazy load pages for code splitting
 const Index = React.lazy(() => import("@/pages/Index"));
+const QualityDashboard = React.lazy(() => import("@/pages/QualityDashboard"));
 const NotFound = React.lazy(() => import("@/pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -34,6 +35,7 @@ const App = () => (
           <Suspense fallback={<PageLoader />}>
             <Routes>
               <Route path="/" element={<Index />} />
+              <Route path="/quality" element={<QualityDashboard />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
@@ -43,11 +45,5 @@ const App = () => (
     </QueryClientProvider>
   </RootErrorBoundary>
 );
-
-// Add a test error boundary trigger for development
-if (process.env.NODE_ENV === 'development') {
-  console.error('Test ErrorBoundary: Throwing intentional error');
-  throw new Error('Intentional Error for Boundary Testing');
-}
 
 export default App;

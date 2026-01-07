@@ -107,4 +107,3 @@ const Component = () => {
   return null; // Placeholder implementation
 };
 
-export default Component;

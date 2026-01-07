@@ -46,4 +46,3 @@ const Component = () => {
   return <div>Card Component</div>;
 };
 
-export default Component;

@@ -11,7 +11,14 @@
     "preview": "vite preview",
     "prepare": "husky",
     "typecheck": "tsc --noEmit",
-    "build:types": "tsc --emitDeclarationOnly --declaration"
+    "build:types": "tsc --emitDeclarationOnly --declaration",
+    "mirror": "tsx scripts/run-mirror.ts",
+    "improve": "tsx scripts/quality-pipeline.ts",
+    "learn": "tsx scripts/run-self-improve.ts",
+    "quality": "npm run mirror && npm run improve",
+    "scout": "npx tsx src/lib/scout.ts",
+    "scout:report": "npx tsx src/lib/report-generator.ts",
+    "scout:blue-ocean": "npx tsx -e \"import('./src/lib/scout.ts').then(m => m.scanBlueOcean(process.env.TOPIC || 'developer-tools'))\""
   },
   "lint-staged": {
     "src/**/*.{ts,tsx}": [

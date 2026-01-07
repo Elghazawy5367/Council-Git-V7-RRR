@@ -1,4 +1,4 @@
-import React, { Suspense, lazy } from "react";
+import React, { Suspense, lazy, useMemo } from "react";
 import { Header } from "@/features/council/components/Header";
 import { ControlPanel } from "@/features/council/components/ControlPanel";
 import { ExpertCard } from "@/features/council/components/ExpertCard";
@@ -13,18 +13,25 @@ const HistorySidebar = lazy(() => import("@/features/council/components/HistoryP
 const MemoryPanel = lazy(() => import("@/features/council/components/MemoryPanel"));
 
 const Index: React.FC = () => {
-  const { activeExpertCount } = useControlPanelStore();
-  const { experts } = useExpertStore();
-  const { showSettings, setShowSettings, showHistory, setShowHistory, showMemory, setShowMemory } = useSettingsStore();
+  const activeExpertCount = useControlPanelStore(state => state.activeExpertCount);
+  const experts = useExpertStore(state => state.experts);
+  const showSettings = useSettingsStore(state => state.showSettings);
+  const setShowSettings = useSettingsStore(state => state.setShowSettings);
+  const showHistory = useSettingsStore(state => state.showHistory);
+  const setShowHistory = useSettingsStore(state => state.setShowHistory);
+  const showMemory = useSettingsStore(state => state.showMemory);
+  const setShowMemory = useSettingsStore(state => state.setShowMemory);
 
-  const getGridCols = () => {
-    const totalCols = activeExpertCount + 1;
-    if (totalCols <= 2) return "grid-cols-1 md:grid-cols-2";
-    if (totalCols <= 3) return "grid-cols-1 md:grid-cols-2 lg:grid-cols-3";
-    if (totalCols <= 4) return "grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4";
-    if (totalCols <= 5) return "grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5";
-    return "grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6";
-  };
+  const getGridCols = useMemo(() => {
+    return () => {
+      const totalCols = activeExpertCount + 1;
+      if (totalCols <= 2) return "grid-cols-1 md:grid-cols-2";
+      if (totalCols <= 3) return "grid-cols-1 md:grid-cols-2 lg:grid-cols-3";
+      if (totalCols <= 4) return "grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4";
+      if (totalCols <= 5) return "grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5";
+      return "grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6";
+    };
+  }, [activeExpertCount]);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -53,3 +60,4 @@ const Index: React.FC = () => {
 };
 
 export default Index;
+

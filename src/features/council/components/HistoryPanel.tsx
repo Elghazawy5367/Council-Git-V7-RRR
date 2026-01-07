@@ -214,7 +214,10 @@ export const HistorySidebar: React.FC<HistoryPanelProps> = ({ onLoadSession, onR
   const [sessions, setSessions] = React.useState<CouncilSession[]>([]);
 
   React.useEffect(() => {
-    setSessions(getSessions() || []);
+    // Only load sessions when panel opens, not on every render
+    if (isOpen) {
+      setSessions(getSessions() || []);
+    }
   }, [isOpen]);
 
   const handleDelete = (id: string, e: React.MouseEvent) => {

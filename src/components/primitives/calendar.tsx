@@ -56,4 +56,3 @@ const Component = () => {
   return <div>Calendar Component</div>;
 };
 
-export default Component;

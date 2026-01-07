@@ -7,8 +7,11 @@ import tsconfigPaths from "vite-tsconfig-paths";
 export default defineConfig(({ mode }) => ({
   server: {
     host: "0.0.0.0",
-    port: 5000,
+    port: 8000,
+    strictPort: false,
     allowedHosts: true,
+    cors: true,
+    middlewareMode: false,
   },
   plugins: [react(), tsconfigPaths()].filter(Boolean),
   resolve: {

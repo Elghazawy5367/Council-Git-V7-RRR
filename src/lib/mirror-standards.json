@@ -1,0 +1,94 @@
+{
+  "version": "1.0.0",
+  "description": "Code quality standards based on elite open-source repositories",
+  "thresholds": {
+    "excellent": 90,
+    "good": 75,
+    "acceptable": 60,
+    "needsWork": 40,
+    "critical": 0
+  },
+  "roleModels": {
+    "react": {
+      "shadcnUI": "https://github.com/shadcn-ui/ui",
+      "description": "Best-in-class React component patterns, TypeScript usage, and Radix UI integration",
+      "nextjs": "https://github.com/vercel/next.js",
+      "useHooks": "https://github.com/uidotdev/usehooks",
+      "errorBoundaries": "https://github.com/bvaughn/react-error-boundary"
+    },
+    "stateManagement": {
+      "zustand": "https://github.com/pmndrs/zustand",
+      "description": "Clean store patterns, middleware usage, and proper state organization",
+      "tanstackQuery": "https://github.com/TanStack/query"
+    },
+    "database": {
+      "dexie": "https://github.com/dexie/Dexie.js",
+      "description": "IndexedDB best practices, migrations, and transaction handling"
+    },
+    "build": {
+      "vite": "https://github.com/vitejs/vite",
+      "description": "Modern build configuration, optimization, and plugin patterns"
+    },
+    "typescript": {
+      "typescript-eslint": "https://github.com/typescript-eslint/typescript-eslint",
+      "description": "Strict TypeScript configuration and best practices"
+    },
+    "testing": {
+      "vitest": "https://github.com/vitest-dev/vitest",
+      "playwright": "https://github.com/microsoft/playwright"
+    }
+  },
+  "patterns": {
+    "errorHandling": {
+      "asyncTryCatch": "async function fetchData() {\n  try {\n    const response = await fetch(url);\n    if (!response.ok) throw new Error(`HTTP ${response.status}`);\n    return await response.json();\n  } catch (error) {\n    console.error('Fetch failed:', error);\n    throw new Error('Failed to fetch data');\n  }\n}",
+      "networkErrors": "try {\n  const data = await apiCall();\n  return { success: true, data };\n} catch (error) {\n  const message = error instanceof Error ? error.message : 'Unknown error';\n  return { success: false, error: message };\n}",
+      "errorBoundaries": "<ErrorBoundary FallbackComponent={ErrorFallback}>\n  <YourComponent />\n</ErrorBoundary>"
+    },
+    "typeSafety": {
+      "noAny": "// ❌ Bad\nfunction process(data: any) { ... }\n\n// ✅ Good\nfunction process<T>(data: T): ProcessedData<T> { ... }",
+      "optionalChaining": "// ❌ Bad\nconst value = obj!.nested!.value;\n\n// ✅ Good\nconst value = obj?.nested?.value ?? defaultValue;",
+      "explicitReturnTypes": "// ❌ Bad\nexport function calculate(x, y) { return x + y; }\n\n// ✅ Good\nexport function calculate(x: number, y: number): number { return x + y; }"
+    },
+    "performance": {
+      "reactMemo": "export default React.memo(MyComponent, (prevProps, nextProps) => {\n  return prevProps.id === nextProps.id;\n});",
+      "useCallback": "const handleClick = useCallback(() => {\n  doSomething(value);\n}, [value]);",
+      "lazyLoading": "const SettingsModal = lazy(() => import('./SettingsModal'));\n\n<Suspense fallback={<Loading />}>\n  <SettingsModal />\n</Suspense>"
+    },
+    "architecture": {
+      "featureSlicing": "src/\n  features/\n    council/\n      api/\n      components/\n      hooks/\n      store/\n      types.ts",
+      "componentSize": "Keep components under 300 lines. Extract:\n- Custom hooks for logic\n- Sub-components for UI sections\n- Utils for helpers",
+      "customHooks": "export function useCouncilData(expertId: string) {\n  const [data, setData] = useState<Expert | null>(null);\n  const [loading, setLoading] = useState(true);\n  \n  useEffect(() => {\n    fetchExpert(expertId)\n      .then(setData)\n      .finally(() => setLoading(false));\n  }, [expertId]);\n  \n  return { data, loading };\n}"
+    }
+  },
+  "metrics": {
+    "maxComponentLines": 300,
+    "maxFunctionLines": 50,
+    "maxFunctionParams": 4,
+    "minTestCoverage": 70,
+    "maxCyclomaticComplexity": 10,
+    "maxAnyTypes": 0,
+    "maxTsIgnores": 0
+  },
+  "antiPatterns": {
+    "avoid": [
+      "Using 'any' type (use 'unknown' or proper types)",
+      "Missing error boundaries in production components",
+      "Inline styles instead of Tailwind classes",
+      "Direct DOM manipulation in React",
+      "Prop drilling (use context or state management)",
+      "Large useEffect hooks (split into multiple)",
+      "Missing TypeScript return types",
+      "console.log in production code",
+      "Synchronous localStorage in hot paths",
+      "Unhandled promise rejections"
+    ]
+  },
+  "bestPractices": {
+    "fileSizeWarning": "Files over 400 lines should be split into smaller modules",
+    "testCoverage": "Aim for 80%+ coverage on critical paths",
+    "documentation": "Export public APIs with JSDoc comments",
+    "naming": "Use PascalCase for components, camelCase for functions, UPPER_CASE for constants",
+    "imports": "Use path aliases (@/, @features/) for cleaner imports",
+    "commits": "Follow conventional commits (feat:, fix:, refactor:)"
+  }
+}

@@ -31,4 +31,3 @@ export { Alert, AlertTitle, AlertDescription };
 
 // Placeholder for undefined Component
 const Component = () => null;
-export default Component;
