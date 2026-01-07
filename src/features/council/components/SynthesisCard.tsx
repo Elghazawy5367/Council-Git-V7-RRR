@@ -29,8 +29,11 @@ const TIER_ICONS: Record<SynthesisTier, React.ComponentType<{ className?: string
 };
 
 export const SynthesisCard: React.FC = () => {
-  const { synthesisResult, isSynthesizing } = useExecutionStore((state) => ({ synthesisResult: state.synthesisResult, isSynthesizing: state.isSynthesizing }));
-  const { synthesisConfig, setSynthesisConfig } = useSettingsStore();
+  // Use individual selectors to avoid creating new object references on every render
+  const synthesisResult = useExecutionStore((state) => state.synthesisResult);
+  const isSynthesizing = useExecutionStore((state) => state.isSynthesizing);
+  const synthesisConfig = useSettingsStore((state) => state.synthesisConfig);
+  const setSynthesisConfig = useSettingsStore((state) => state.setSynthesisConfig);
   const [showConfig, setShowConfig] = useState<boolean>(false); // Fixed type of showConfig
   const tierConfig = SYNTHESIS_TIERS[synthesisConfig.tier];
 

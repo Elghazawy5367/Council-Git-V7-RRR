@@ -16,7 +16,9 @@ interface ExpertOutputFooterProps {
 }
 
 export const ExpertOutputFooter: React.FC<ExpertOutputFooterProps> = () => {
-  const { executeCouncil, isLoading } = useExecutionStore();
+  // Use individual selectors to avoid creating new object references on every render
+  const executeCouncil = useExecutionStore((state) => state.executeCouncil);
+  const isLoading = useExecutionStore((state) => state.isLoading);
 
   const onRetry = () => {
     const mockMutationResult = {

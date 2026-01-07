@@ -43,27 +43,16 @@ interface MemoryPanelProps {
 }
 
 export const MemoryPanel: React.FC<MemoryPanelProps> = ({ isOpen, onClose }) => {
-  const {
-    memory,
-    searchQuery,
-    filterType,
-    isLoading,
-    loadMemory,
-    toggleEnabled,
-    clearAll,
-    setSearchQuery,
-    setFilterType,
-  } = useMemoryStore((state) => ({
-    memory: state.memory,
-    searchQuery: state.searchQuery,
-    filterType: state.filterType,
-    isLoading: state.isLoading,
-    loadMemory: state.loadMemory,
-    toggleEnabled: state.toggleEnabled,
-    clearAll: state.clearAll,
-    setSearchQuery: state.setSearchQuery,
-    setFilterType: state.setFilterType,
-  }));
+  // Use individual selectors to avoid creating new object references on every render
+  const memory = useMemoryStore((state) => state.memory);
+  const searchQuery = useMemoryStore((state) => state.searchQuery);
+  const filterType = useMemoryStore((state) => state.filterType);
+  const isLoading = useMemoryStore((state) => state.isLoading);
+  const loadMemory = useMemoryStore((state) => state.loadMemory);
+  const toggleEnabled = useMemoryStore((state) => state.toggleEnabled);
+  const clearAll = useMemoryStore((state) => state.clearAll);
+  const setSearchQuery = useMemoryStore((state) => state.setSearchQuery);
+  const setFilterType = useMemoryStore((state) => state.setFilterType);
 
   useEffect(() => {
     if (isOpen) {
