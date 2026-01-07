@@ -24,20 +24,13 @@ import { ChevronDown, ChevronRight, Users, User, RotateCcw, Check } from 'lucide
 import { Expert } from '@/features/council/lib/types';
 
 export const PersonaSelector: React.FC = () => {
-  const {
-    activeExpertCount,
-    loadPersona,
-    loadTeam,
-    clearPersona,
-    resetToDefault,
-  } = useControlPanelStore((state) => ({
-    activeExpertCount: state.activeExpertCount,
-    loadPersona: state.loadPersona,
-    loadTeam: state.loadTeam,
-    clearPersona: state.clearPersona,
-    resetToDefault: state.resetToDefault,
-  }));
-  const { experts } = useExpertStore((state) => ({ experts: state.experts }));
+  // Use individual selectors to avoid creating new object references on every render
+  const activeExpertCount = useControlPanelStore((state) => state.activeExpertCount);
+  const loadPersona = useControlPanelStore((state) => state.loadPersona);
+  const loadTeam = useControlPanelStore((state) => state.loadTeam);
+  const clearPersona = useControlPanelStore((state) => state.clearPersona);
+  const resetToDefault = useControlPanelStore((state) => state.resetToDefault);
+  const experts = useExpertStore((state) => state.experts);
 
   const [showIndividual, setShowIndividual] = useState<boolean>(false);
   const teams = getTeamSelectorOptions();

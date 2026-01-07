@@ -33,32 +33,22 @@ const MODE_ICONS: Record<ExecutionMode, React.ComponentType<{ className?: string
 };
 
 export const ControlPanel: React.FC = () => {
-  const {
-    task,
-    setTask,
-    mode,
-    setMode,
-    activeExpertCount,
-    setActiveExpertCount,
-    debateRounds,
-    setDebateRounds,
-    fileData,
-    setFileData,
-  } = useControlPanelStore((state) => ({
-    task: state.task,
-    setTask: state.setTask,
-    mode: state.mode,
-    setMode: state.setMode,
-    activeExpertCount: state.activeExpertCount,
-    setActiveExpertCount: state.setActiveExpertCount,
-    debateRounds: state.debateRounds,
-    setDebateRounds: state.setDebateRounds,
-    fileData: state.fileData,
-    setFileData: state.setFileData,
-  }));
+  // Use individual selectors to avoid creating new object references on every render
+  const task = useControlPanelStore((state) => state.task);
+  const setTask = useControlPanelStore((state) => state.setTask);
+  const mode = useControlPanelStore((state) => state.mode);
+  const setMode = useControlPanelStore((state) => state.setMode);
+  const activeExpertCount = useControlPanelStore((state) => state.activeExpertCount);
+  const setActiveExpertCount = useControlPanelStore((state) => state.setActiveExpertCount);
+  const debateRounds = useControlPanelStore((state) => state.debateRounds);
+  const setDebateRounds = useControlPanelStore((state) => state.setDebateRounds);
+  const fileData = useControlPanelStore((state) => state.fileData);
+  const setFileData = useControlPanelStore((state) => state.setFileData);
 
-  const { isLoading, statusMessage } = useExecutionStore((state) => ({ isLoading: state.isLoading, statusMessage: state.statusMessage }));
-  const { vaultStatus, setShowSettings } = useSettingsStore();
+  const isLoading = useExecutionStore((state) => state.isLoading);
+  const statusMessage = useExecutionStore((state) => state.statusMessage);
+  const vaultStatus = useSettingsStore((state) => state.vaultStatus);
+  const setShowSettings = useSettingsStore((state) => state.setShowSettings);
   const synthesisMutation = useExecuteSynthesis();
 
   const fileInputRef = useRef<HTMLInputElement>(null);

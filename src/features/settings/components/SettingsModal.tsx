@@ -18,14 +18,13 @@ interface SettingsModalProps {
 }
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
-  const { 
-    vaultStatus, 
-    handleCreateVault, 
-    handleUnlockVault, 
-    handleLockVault, 
-    openRouterKey, 
-    setOpenRouterKey 
-  } = useSettingsStore();
+  // Use individual selectors to avoid creating new object references on every render
+  const vaultStatus = useSettingsStore((state) => state.vaultStatus);
+  const handleCreateVault = useSettingsStore((state) => state.handleCreateVault);
+  const handleUnlockVault = useSettingsStore((state) => state.handleUnlockVault);
+  const handleLockVault = useSettingsStore((state) => state.handleLockVault);
+  const openRouterKey = useSettingsStore((state) => state.openRouterKey);
+  const setOpenRouterKey = useSettingsStore((state) => state.setOpenRouterKey);
   const [password, setPassword] = useState<string>('');
   const [newPassword, setNewPassword] = useState<string>('');
   const [confirmPassword, setConfirmPassword] = useState<string>('');

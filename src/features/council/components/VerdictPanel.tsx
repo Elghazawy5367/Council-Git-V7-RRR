@@ -14,7 +14,9 @@ import { Maximize2, ClipboardCopy } from 'lucide-react';
 import { toast } from 'sonner';
 
 export const VerdictPanel: React.FC = () => {
-  const { verdict, status } = useExecutionStore();
+  // Use individual selectors to avoid creating new object references on every render
+  const verdict = useExecutionStore((state) => state.verdict);
+  const status = useExecutionStore((state) => state.status);
 
   const handleCopy = () => {
     if (verdict) {
