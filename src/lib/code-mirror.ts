@@ -39,19 +39,18 @@ export interface AnalysisResult {
  */
 export async function analyzeCodeQuality(filePath: string): Promise<AnalysisResult> {
   const content = fs.readFileSync(filePath, "utf-8");
-  const lines = content.split("\n");
   
   const gaps: CodeGap[] = [];
   const roleModelRepos: string[] = [];
   
   // Error Handling Analysis
-  const errorHandlingScore = analyzeErrorHandling(content, lines, gaps);
+  const errorHandlingScore = analyzeErrorHandling(content, gaps);
   
   // Type Safety Analysis
-  const typeSafetyScore = analyzeTypeSafety(content, lines, gaps);
+  const typeSafetyScore = analyzeTypeSafety(content, gaps);
   
   // Performance Analysis
-  const performanceScore = analyzePerformance(content, lines, gaps);
+  const performanceScore = analyzePerformance(content, gaps);
   
   // Architecture Analysis
   const architectureScore = analyzeArchitecture(filePath, content, gaps);
@@ -88,7 +87,7 @@ export async function analyzeCodeQuality(filePath: string): Promise<AnalysisResu
 /**
  * Analyzes error handling patterns
  */
-function analyzeErrorHandling(content: string, lines: string[], gaps: CodeGap[]): number {
+function analyzeErrorHandling(content: string, gaps: CodeGap[]): number {
   let score = 100;
   
   // Check for try-catch blocks
@@ -150,7 +149,7 @@ function analyzeErrorHandling(content: string, lines: string[], gaps: CodeGap[])
 /**
  * Analyzes type safety
  */
-function analyzeTypeSafety(content: string, lines: string[], gaps: CodeGap[]): number {
+function analyzeTypeSafety(content: string, gaps: CodeGap[]): number {
   let score = 100;
   
   // Check for 'any' types
@@ -212,7 +211,7 @@ function analyzeTypeSafety(content: string, lines: string[], gaps: CodeGap[]): n
 /**
  * Analyzes performance patterns
  */
-function analyzePerformance(content: string, lines: string[], gaps: CodeGap[]): number {
+function analyzePerformance(content: string, gaps: CodeGap[]): number {
   let score = 100;
   
   // Check for missing React.memo on components

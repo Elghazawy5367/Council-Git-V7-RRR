@@ -368,7 +368,7 @@ export async function runScout(): Promise<ScoutReport> {
   
   // Step 5: Detect emerging trends
   console.log("📈 Step 5: Detecting trends...");
-  const trends = await detectTrends(painPoints, repos);
+  const trends = await detectTrends(painPoints);
   console.log(`✓ Detected ${trends.length} trends\n`);
   
   // Step 6: Blue Ocean scan
@@ -557,7 +557,7 @@ async function extractPainPoints(repos: any[], config: ScoutConfig): Promise<Pai
   
   // Add mock data if no real data
   if (painPoints.length === 0) {
-    painPoints.push(...generateMockPainPoints(config));
+    painPoints.push(...generateMockPainPoints());
   }
   
   return painPoints;
@@ -583,7 +583,7 @@ async function clusterPainPoints(painPoints: PainPoint[]): Promise<PainPoint[]> 
   // Merge clusters and pick representative
   const clustered: PainPoint[] = [];
   
-  for (const [key, points] of clusters) {
+  for (const [, points] of clusters) {
     if (points.length === 0) continue;
     
     // Pick the one with most engagement
@@ -612,12 +612,12 @@ async function identifyOpportunities(painPoints: PainPoint[]): Promise<ProductOp
     for (const solution of solutions) {
       opportunities.push({
         id: `opp-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
-        category: categorizeOpportunity(point),
+        category: categorizeOpportunity(),
         painPoint: point.title,
         solution: solution,
         confidence: calculateConfidence(point),
         marketSize: estimateMarketSize(point),
-        competition: assessCompetition(point),
+        competition: assessCompetition(),
         effort: estimateEffort(solution),
         impact: estimateImpact(point),
         evidence: [point.repository, ...point.urls.slice(0, 3)],
@@ -639,7 +639,7 @@ async function identifyOpportunities(painPoints: PainPoint[]): Promise<ProductOp
 /**
  * Detect emerging trends
  */
-async function detectTrends(painPoints: PainPoint[], repos: any[]): Promise<string[]> {
+async function detectTrends(painPoints: PainPoint[]): Promise<string[]> {
   const trends: string[] = [];
   
   // Analyze keywords frequency
@@ -827,7 +827,7 @@ function generateSolutions(point: PainPoint): string[] {
   return solutions;
 }
 
-function categorizeOpportunity(point: PainPoint): string {
+function categorizeOpportunity(): string {
   const categories = ["Developer Tools", "UI/UX", "Integration", "Performance", "Automation"];
   return categories[Math.floor(Math.random() * categories.length)];
 }
@@ -844,7 +844,7 @@ function estimateMarketSize(point: PainPoint): number {
   return point.frequency * 100; // Rough estimate
 }
 
-function assessCompetition(point: PainPoint): ProductOpportunity["competition"] {
+function assessCompetition(): ProductOpportunity["competition"] {
   return ["none", "weak", "moderate", "strong"][Math.floor(Math.random() * 4)] as any;
 }
 
@@ -888,7 +888,7 @@ function generateMockRepos(config: ScoutConfig): any[] {
   return mockRepos;
 }
 
-function generateMockPainPoints(config: ScoutConfig): PainPoint[] {
+function generateMockPainPoints(): PainPoint[] {
   return [
     {
       id: "mock-1",

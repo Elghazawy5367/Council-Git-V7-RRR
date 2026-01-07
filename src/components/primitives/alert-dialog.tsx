@@ -103,7 +103,3 @@ export {
   AlertDialogCancel,
 };
 
-const Component = () => {
-  return null; // Placeholder implementation
-};
-

@@ -51,8 +51,3 @@ Calendar.displayName = "Calendar";
 
 export { Calendar };
 
-// Fix unused _props and missing Component definition
-const Component = () => {
-  return <div>Calendar Component</div>;
-};
-

@@ -25,8 +25,3 @@ Checkbox.displayName = CheckboxPrimitive.Root.displayName;
 
 export { Checkbox };
 
-// Fix missing Component definition
-const Component = () => {
-  return <div>Checkbox Component</div>;
-};
-

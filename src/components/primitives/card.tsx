@@ -42,7 +42,3 @@ CardFooter.displayName = "CardFooter";
 
 export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent };
 
-const Component = () => {
-  return <div>Card Component</div>;
-};
-

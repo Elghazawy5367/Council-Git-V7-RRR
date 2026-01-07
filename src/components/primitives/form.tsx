@@ -43,7 +43,3 @@ FormLabel.displayName = "FormLabel";
 
 export { Form, FormField, FormItem, FormLabel };
 
-const Component = () => {
-  return <div>Form Component</div>;
-};
-

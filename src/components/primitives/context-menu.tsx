@@ -159,10 +159,6 @@ const ContextMenuShortcut = ({ className, ...props }: React.HTMLAttributes<HTMLS
 };
 ContextMenuShortcut.displayName = "ContextMenuShortcut";
 
-const Component = () => {
-  return null; // Placeholder implementation
-};
-
 export {
   ContextMenu,
   ContextMenuTrigger,

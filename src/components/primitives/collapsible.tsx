@@ -8,8 +8,3 @@ const CollapsibleContent = CollapsiblePrimitive.CollapsibleContent;
 
 export { Collapsible, CollapsibleTrigger, CollapsibleContent };
 
-// Defined Component
-const Component = () => {
-  return <div>Collapsible Component</div>;
-};
-

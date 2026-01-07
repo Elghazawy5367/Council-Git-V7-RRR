@@ -4,7 +4,3 @@ const AspectRatio = AspectRatioPrimitive.Root;
 
 export { AspectRatio };
 
-const Component = () => {
-  return <div>Aspect Ratio Component</div>;
-};
-

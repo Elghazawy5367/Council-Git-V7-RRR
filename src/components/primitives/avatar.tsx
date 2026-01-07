@@ -35,10 +35,5 @@ const AvatarFallback = React.forwardRef<
 ));
 AvatarFallback.displayName = AvatarPrimitive.Fallback.displayName;
 
-// Fix missing Component definition
-const Component = () => {
-  return <div>Avatar Component</div>;
-};
-
 export { Avatar, AvatarImage, AvatarFallback };
 

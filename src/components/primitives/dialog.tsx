@@ -81,11 +81,6 @@ const DialogDescription = React.forwardRef<
 ));
 DialogDescription.displayName = DialogPrimitive.Description.displayName;
 
-// Fix missing Component definition
-const Component = () => {
-  return <div>Dialog Component</div>;
-};
-
 export {
   Dialog,
   DialogPortal,

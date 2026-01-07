@@ -73,11 +73,6 @@ const DrawerDescription = React.forwardRef<
 ));
 DrawerDescription.displayName = DrawerPrimitive.Description.displayName;
 
-// Fix missing Component definition
-const Component = () => {
-  return <div>Drawer Component</div>;
-};
-
 export {
   Drawer,
   DrawerPortal,

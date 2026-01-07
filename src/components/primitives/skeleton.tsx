@@ -7,8 +7,3 @@ function Skeleton({ className, ...props }: React.HTMLAttributes<HTMLDivElement>)
 
 export { Skeleton };
 
-const Component = () => {
-  // Placeholder for the correct component
-  return <div>Skeleton Component</div>;
-};
-
