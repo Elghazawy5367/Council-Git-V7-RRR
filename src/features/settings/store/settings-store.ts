@@ -16,6 +16,8 @@ interface VaultUnlockResult {
   keys: {
     openRouterKey: string;
     serperKey?: string;
+    githubApiKey?: string;
+    redditApiKey?: string;
   };
 }
 
@@ -24,6 +26,10 @@ interface SettingsState {
   setApiKey: (key: string) => void;
   openRouterKey: string;
   setOpenRouterKey: (key: string) => void;
+  githubApiKey: string;
+  setGithubApiKey: (key: string) => void;
+  redditApiKey: string;
+  setRedditApiKey: (key: string) => void;
   model: string;
   setModel: (model: string) => void;
   synthesisConfig: SynthesisConfig;
@@ -35,7 +41,7 @@ interface SettingsState {
   showMemory: boolean;
   setShowMemory: (show: boolean) => void;
   vaultStatus: VaultStatus;
-  handleCreateVault: (data: { password: string; openRouterKey: string; serperKey?: string }) => Promise<VaultCreationResult>;
+  handleCreateVault: (data: { password: string; openRouterKey: string; serperKey?: string; githubApiKey?: string; redditApiKey?: string }) => Promise<VaultCreationResult>;
   handleUnlockVault: (password: string) => Promise<VaultUnlockResult>;
   handleLockVault: () => void;
 }
@@ -48,6 +54,10 @@ export const useSettingsStore = create<SettingsState>(
       setApiKey: (key: string) => set({ apiKey: key }),
       openRouterKey: '',
       setOpenRouterKey: (key: string) => set({ openRouterKey: key }),
+      githubApiKey: '',
+      setGithubApiKey: (key: string) => set({ githubApiKey: key }),
+      redditApiKey: '',
+      setRedditApiKey: (key: string) => set({ redditApiKey: key }),
       model: 'gpt-4-turbo-preview',
       setModel: (model: string) => set({ model }),
       synthesisConfig: DEFAULT_SYNTHESIS_CONFIG,
@@ -59,7 +69,7 @@ export const useSettingsStore = create<SettingsState>(
       showMemory: false,
       setShowMemory: (show: boolean) => set({ showMemory: show }),
       vaultStatus: initializeVault(),
-      handleCreateVault: async (data: { password: string; openRouterKey: string; serperKey?: string }) => {
+      handleCreateVault: async (data: { password: string; openRouterKey: string; serperKey?: string; githubApiKey?: string; redditApiKey?: string }) => {
         const result = await createVault(data);
         if (result.success) {
           set({ vaultStatus: getVaultStatus() });
@@ -73,17 +83,22 @@ export const useSettingsStore = create<SettingsState>(
         const result = await unlockVault(password);
         if (result.success && 'keys' in result) {
           const unlockResult = result as VaultUnlockResult;
-          set({ vaultStatus: getVaultStatus(), openRouterKey: unlockResult.keys.openRouterKey });
+          set({ 
+            vaultStatus: getVaultStatus(), 
+            openRouterKey: unlockResult.keys.openRouterKey,
+            githubApiKey: unlockResult.keys.githubApiKey || '',
+            redditApiKey: unlockResult.keys.redditApiKey || ''
+          });
           toast.success('Vault Unlocked');
           return unlockResult;
         } else {
           toast.error('Unlock Failed');
-          return { success: false, error: 'Unlock Failed', keys: { openRouterKey: '' } } as VaultUnlockResult;
+          return { success: false, error: 'Unlock Failed', keys: { openRouterKey: '', githubApiKey: '', redditApiKey: '' } } as VaultUnlockResult;
         }
       },
       handleLockVault: () => {
         lockVault();
-        set({ vaultStatus: getVaultStatus(), openRouterKey: '' });
+        set({ vaultStatus: getVaultStatus(), openRouterKey: '', githubApiKey: '', redditApiKey: '' });
         toast.info('Vault Locked');
       },
     }),

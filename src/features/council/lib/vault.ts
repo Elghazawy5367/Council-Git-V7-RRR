@@ -13,6 +13,8 @@ interface VaultData {
 interface SessionData {
   openRouterKey: string;
   serperKey?: string;
+  githubApiKey?: string;
+  redditApiKey?: string;
   unlockTime: number;
 }
 
@@ -70,11 +72,15 @@ export async function createVault(data: {
   password: string;
   openRouterKey: string;
   serperKey?: string;
+  githubApiKey?: string;
+  redditApiKey?: string;
 }): Promise<{ success: boolean; error?: string }> {
   try {
     const keysToStore = JSON.stringify({
       openRouterKey: data.openRouterKey,
       serperKey: data.serperKey || '',
+      githubApiKey: data.githubApiKey || '',
+      redditApiKey: data.redditApiKey || '',
     });
 
     const vaultData: VaultData = {
@@ -87,6 +93,8 @@ export async function createVault(data: {
     const sessionData: SessionData = {
       openRouterKey: data.openRouterKey,
       serperKey: data.serperKey,
+      githubApiKey: data.githubApiKey,
+      redditApiKey: data.redditApiKey,
       unlockTime: Date.now(),
     };
     sessionStorage.setItem(SESSION_KEY, JSON.stringify(sessionData));
@@ -99,7 +107,7 @@ export async function createVault(data: {
 }
 
 // Unlock vault
-export async function unlockVault(password: string): Promise<{ success: boolean; error?: string; keys?: { openRouterKey: string; serperKey?: string } }> {
+export async function unlockVault(password: string): Promise<{ success: boolean; error?: string; keys?: { openRouterKey: string; serperKey?: string; githubApiKey?: string; redditApiKey?: string } }> {
   try {
     const vaultStr = localStorage.getItem(VAULT_KEY);
     if (!vaultStr) {
@@ -117,6 +125,8 @@ export async function unlockVault(password: string): Promise<{ success: boolean;
     const sessionData: SessionData = {
       openRouterKey: keys.openRouterKey,
       serperKey: keys.serperKey,
+      githubApiKey: keys.githubApiKey,
+      redditApiKey: keys.redditApiKey,
       unlockTime: Date.now(),
     };
     sessionStorage.setItem(SESSION_KEY, JSON.stringify(sessionData));
@@ -125,7 +135,9 @@ export async function unlockVault(password: string): Promise<{ success: boolean;
       success: true, 
       keys: { 
         openRouterKey: keys.openRouterKey, 
-        serperKey: keys.serperKey 
+        serperKey: keys.serperKey,
+        githubApiKey: keys.githubApiKey,
+        redditApiKey: keys.redditApiKey
       } 
     };
   } catch (error) {
@@ -140,7 +152,7 @@ export function lockVault(): void {
 }
 
 // Get session keys
-export function getSessionKeys(): { openRouterKey: string; serperKey?: string } | null {
+export function getSessionKeys(): { openRouterKey: string; serperKey?: string; githubApiKey?: string; redditApiKey?: string } | null {
   const session = sessionStorage.getItem(SESSION_KEY);
   if (!session) return null;
 
@@ -160,6 +172,8 @@ export function getSessionKeys(): { openRouterKey: string; serperKey?: string } 
     return {
       openRouterKey: sessionData.openRouterKey,
       serperKey: sessionData.serperKey,
+      githubApiKey: sessionData.githubApiKey,
+      redditApiKey: sessionData.redditApiKey,
     };
   } catch {
     return null;

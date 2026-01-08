@@ -25,7 +25,11 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
     handleUnlockVault, 
     handleLockVault, 
     openRouterKey, 
-    setOpenRouterKey 
+    setOpenRouterKey,
+    githubApiKey,
+    setGithubApiKey,
+    redditApiKey,
+    setRedditApiKey
   } = useSettingsStore(useShallow((state) => ({
     vaultStatus: state.vaultStatus,
     handleCreateVault: state.handleCreateVault,
@@ -33,6 +37,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
     handleLockVault: state.handleLockVault,
     openRouterKey: state.openRouterKey,
     setOpenRouterKey: state.setOpenRouterKey,
+    githubApiKey: state.githubApiKey,
+    setGithubApiKey: state.setGithubApiKey,
+    redditApiKey: state.redditApiKey,
+    setRedditApiKey: state.setRedditApiKey,
   })));
   const [password, setPassword] = useState<string>('');
   const [newPassword, setNewPassword] = useState<string>('');
@@ -43,7 +51,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
       alert('Passwords do not match');
       return;
     }
-    const result = await handleCreateVault({ password: newPassword, openRouterKey });
+    const result = await handleCreateVault({ 
+      password: newPassword, 
+      openRouterKey,
+      githubApiKey,
+      redditApiKey
+    });
     if (result.success) {
       onClose();
     }
@@ -74,8 +87,27 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                 <Label className="text-right">OpenRouter Key</Label>
                 <Input
                   className="col-span-3"
+                  placeholder="sk-or-..."
                   value={openRouterKey}
                   onChange={(e) => setOpenRouterKey(e.target.value)}
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label className="text-right">GitHub API Key</Label>
+                <Input
+                  className="col-span-3"
+                  placeholder="ghp_... (optional)"
+                  value={githubApiKey}
+                  onChange={(e) => setGithubApiKey(e.target.value)}
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label className="text-right">Reddit API Key</Label>
+                <Input
+                  className="col-span-3"
+                  placeholder="Reddit API key (optional)"
+                  value={redditApiKey}
+                  onChange={(e) => setRedditApiKey(e.target.value)}
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
@@ -108,7 +140,23 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
               />
             </div>
           ) : (
-            <p>Vault is unlocked.</p>
+            <div className="space-y-4">
+              <p className="text-sm text-muted-foreground">Vault is unlocked. Your API keys are securely stored.</p>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between p-2 bg-muted/30 rounded">
+                  <span className="text-sm">OpenRouter Key</span>
+                  <span className="text-xs text-muted-foreground">{openRouterKey ? '••••••••' : 'Not set'}</span>
+                </div>
+                <div className="flex items-center justify-between p-2 bg-muted/30 rounded">
+                  <span className="text-sm">GitHub API Key</span>
+                  <span className="text-xs text-muted-foreground">{githubApiKey ? '••••••••' : 'Not set'}</span>
+                </div>
+                <div className="flex items-center justify-between p-2 bg-muted/30 rounded">
+                  <span className="text-sm">Reddit API Key</span>
+                  <span className="text-xs text-muted-foreground">{redditApiKey ? '••••••••' : 'Not set'}</span>
+                </div>
+              </div>
+            </div>
           )}
         </div>
         <DialogFooter>

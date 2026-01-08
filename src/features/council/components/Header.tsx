@@ -6,6 +6,7 @@ import { Brain, Settings, Lock, Unlock, DollarSign, History } from 'lucide-react
 import { Button } from '@/components/primitives/button';
 import { Badge } from '@/components/primitives/badge';
 import { MemoryBadge } from './MemoryBadge';
+import { ProjectFeaturesDropdown } from '@/components/primitives/dropdown-menu';
 
 export const Header: React.FC = () => {
   const cost = useExecutionStore(state => state.cost);
@@ -40,6 +41,9 @@ export const Header: React.FC = () => {
 
           {/* Right side */}
           <div className="flex items-center gap-4">
+            {/* Features dropdown */}
+            <ProjectFeaturesDropdown />
+            
             {/* Memory badge */}
             <MemoryBadge count={memoryCount} onClick={() => setShowMemory(true)} />
 

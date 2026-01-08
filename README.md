@@ -4,6 +4,43 @@
 
 **URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
 
+---
+
+## 🚀 The Council - Intelligence Features
+
+The Council includes powerful intelligence tools for discovering market opportunities:
+
+### 📊 Daily Intelligence Report (Feature 11)
+Generate comprehensive daily briefs combining Scout + Goldmine Detector + Mining Drill:
+
+```bash
+# Generate daily brief for any niche
+npm run brief developer-tools
+npm run brief react-native
+npm run brief machine-learning
+
+# Show help
+npm run brief:help
+```
+
+**Output:** Markdown report + JSON data with:
+- Abandoned goldmines (high demand, zero competition)
+- Pain point analysis (marketing copy from user complaints)
+- 30-day sprint action plan
+- Revenue projections
+
+**Documentation:** See [docs/DAILY_INTELLIGENCE_REPORT.md](docs/DAILY_INTELLIGENCE_REPORT.md)
+
+### Other Intelligence Tools
+```bash
+npm run scout          # Scan GitHub for opportunities
+npm run mirror         # Code quality analysis
+npm run quality        # Full quality pipeline
+npm run learn          # Learn from successful repos
+```
+
+---
+
 ## How can I edit this code?
 
 There are several ways of editing your application.

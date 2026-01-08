@@ -63,6 +63,19 @@ const logError = (error: Error, info: ErrorInfo) => {
   // In production, send to Sentry/LogRocket here
   console.error("CRITICAL_UI_FAILURE:", error, info.componentStack);
   
+  // Log structured error for production monitoring
+  const errorLog = {
+    timestamp: new Date().toISOString(),
+    message: error.message,
+    name: error.name,
+    stack: error.stack,
+    componentStack: info.componentStack,
+    userAgent: navigator.userAgent,
+    url: window.location.href
+  };
+  
+  console.error('[ErrorBoundary] Structured Error Log:', errorLog);
+  
   // Check if error is recoverable
   const isRecoverable = !(
     error.message?.includes('chunk') ||
@@ -112,3 +125,55 @@ const CustomErrorBoundary: React.FC<CustomErrorBoundaryProps> = ({ children }) =
 };
 
 export default CustomErrorBoundary;
+
+/**
+ * Feature-specific Error Boundary
+ * Isolates errors to individual features without crashing the whole app
+ */
+export const FeatureErrorBoundary: React.FC<{
+  children: React.ReactNode;
+  featureName: string;
+  fallback?: React.ReactNode;
+}> = ({ children, featureName, fallback }) => {
+  const defaultFallback = (
+    <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-6">
+      <div className="flex items-center gap-3 mb-3">
+        <div className="h-10 w-10 rounded-full bg-yellow-100 flex items-center justify-center">
+          <AlertCircle className="h-5 w-5 text-yellow-600" />
+        </div>
+        <div>
+          <h3 className="font-semibold text-yellow-900">
+            {featureName} Temporarily Unavailable
+          </h3>
+          <p className="text-sm text-yellow-700">
+            This feature encountered an error. Other features continue working normally.
+          </p>
+        </div>
+      </div>
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => window.location.reload()}
+        className="mt-2"
+      >
+        <RefreshCw className="h-4 w-4 mr-2" />
+        Retry Feature
+      </Button>
+    </div>
+  );
+
+  return (
+    <ErrorBoundary
+      FallbackComponent={() => fallback || defaultFallback}
+      onError={(error, info) => {
+        console.error(`[${featureName}] Feature Error:`, error);
+        logError(error, info);
+      }}
+      onReset={() => {
+        console.log(`[${featureName}] Feature reset initiated`);
+      }}
+    >
+      {children}
+    </ErrorBoundary>
+  );
+};
