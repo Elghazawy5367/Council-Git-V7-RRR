@@ -62,6 +62,17 @@ function ErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
 const logError = (error: Error, info: ErrorInfo) => {
   // In production, send to Sentry/LogRocket here
   console.error("CRITICAL_UI_FAILURE:", error, info.componentStack);
+  
+  // Check if error is recoverable
+  const isRecoverable = !(
+    error.message?.includes('chunk') ||
+    error.message?.includes('dynamically imported') ||
+    error.message?.includes('Failed to fetch')
+  );
+  
+  if (!isRecoverable) {
+    console.log('[ErrorBoundary] Module error detected, may require page reload');
+  }
 };
 
 interface CustomErrorBoundaryProps {
@@ -74,8 +85,25 @@ const CustomErrorBoundary: React.FC<CustomErrorBoundaryProps> = ({ children }) =
       FallbackComponent={ErrorFallback}
       onError={logError}
       onReset={() => {
-        // Clear local storage or state if needed
+        // Preserve critical state before reset
         console.log("System state reset initiated");
+        
+        // Backup localStorage
+        const backup: Record<string, string> = {};
+        ['council_experts', 'council_memory', 'settings-storage'].forEach(key => {
+          const value = localStorage.getItem(key);
+          if (value) backup[key] = value;
+        });
+        
+        // Clear only volatile state
+        sessionStorage.clear();
+        
+        // Restore backed up state
+        Object.entries(backup).forEach(([key, value]) => {
+          localStorage.setItem(key, value);
+        });
+        
+        console.log("State preserved and volatile data cleared");
       }}
     >
       {children}
