@@ -20,7 +20,12 @@
     "scout:report": "npx tsx src/lib/report-generator.ts",
     "scout:blue-ocean": "npx tsx -e \"import('./src/lib/scout.ts').then(m => m.scanBlueOcean(process.env.TOPIC || 'developer-tools'))\"",
     "brief": "tsx scripts/daily-brief.ts",
-    "brief:help": "tsx scripts/daily-brief.ts --help"
+    "brief:help": "tsx scripts/daily-brief.ts --help",
+    "studio": "tsx src/lib/google-studio-hack.ts",
+    "sniper": "tsx src/lib/reddit-sniper.ts",
+    "forks": "tsx src/lib/fork-evolution.ts",
+    "twin": "tsx src/lib/twin-mimicry.ts",
+    "viral": "tsx src/lib/viral-radar.ts"
   },
   "lint-staged": {
     "src/**/*.{ts,tsx}": [

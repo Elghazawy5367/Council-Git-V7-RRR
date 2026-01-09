@@ -7,8 +7,7 @@ import tsconfigPaths from "vite-tsconfig-paths";
 export default defineConfig(({ mode }) => {
   // Detect if running in GitHub Codespaces or similar HTTPS environment
   const isCodespaces = process.env.CODESPACES === 'true' || process.env.GITHUB_CODESPACE_TOKEN;
-  const isHttps = process.env.VITE_HMR_PROTOCOL === 'wss' || isCodespaces;
-
+  
   return {
     server: {
       host: "0.0.0.0",
@@ -20,10 +19,7 @@ export default defineConfig(({ mode }) => {
       hmr: {
         overlay: true, // Show errors as overlay instead of crashing
         timeout: 30000, // Increase timeout for slower connections
-        protocol: isHttps ? 'wss' : 'ws', // Auto-detect secure WebSocket
-        host: process.env.CODESPACE_NAME 
-          ? `${process.env.CODESPACE_NAME}-8000.${process.env.GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}`
-          : undefined,
+        clientPort: isCodespaces ? 443 : 8000,
       },
       watch: {
         // Reduce file watching overhead

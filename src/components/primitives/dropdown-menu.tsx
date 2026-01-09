@@ -199,6 +199,41 @@ const ProjectFeaturesDropdown = () => {
       category: "intelligence"
     },
     { 
+      name: "The Sniper", 
+      description: "Reddit lead generation with buying intent scoring",
+      icon: "🎯",
+      enabled: true,
+      category: "intelligence"
+    },
+    { 
+      name: "Fork Evolution", 
+      description: "Discover user-wanted features from repository forks",
+      icon: "🍴",
+      enabled: true,
+      category: "intelligence"
+    },
+    { 
+      name: "Viral Radar", 
+      description: "Scan X, Instagram & trends for viral content",
+      icon: "📡",
+      enabled: true,
+      category: "intelligence"
+    },
+    { 
+      name: "Twin Mimicry", 
+      description: "Extract mental models from elite developers",
+      icon: "👥",
+      enabled: true,
+      category: "intelligence"
+    },
+    { 
+      name: "Google Studio Hack", 
+      description: "Bypass IDE limits with unlimited AI tokens",
+      icon: "🚀",
+      enabled: true,
+      category: "foundation"
+    },
+    { 
       name: "Data Fetching & Cache", 
       description: "React Query with intelligent caching",
       icon: "📊",
@@ -248,7 +283,7 @@ const ProjectFeaturesDropdown = () => {
         <span>🚀</span>
         <span>Features</span>
         <span className="ml-1 text-xs px-1.5 py-0.5 rounded-full bg-primary/10 text-primary">
-          {activeCount}/10
+          {activeCount}/15
         </span>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-80">
