@@ -67,98 +67,161 @@ export const FeatureConfigModal: React.FC<FeatureConfigModalProps> = ({ isOpen, 
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto glass-panel">
+      <DialogContent className="max-w-4xl max-h-[85vh] overflow-y-auto glass-panel">
         <DialogHeader>
-          <DialogTitle>Feature Configuration</DialogTitle>
-          <DialogDescription>
-            Configure automated features and their schedules
+          <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-violet-400 via-fuchsia-400 to-pink-400 bg-clip-text text-transparent">
+            ⚙️ Feature Configuration Center
+          </DialogTitle>
+          <DialogDescription className="text-base mt-2">
+            Fine-tune each feature with scheduling, thresholds, and advanced options
           </DialogDescription>
         </DialogHeader>
 
         <Tabs defaultValue="scout" className="w-full">
-          <TabsList className="grid w-full grid-cols-5 lg:grid-cols-10 gap-1">
-            <TabsTrigger value="scout">Scout</TabsTrigger>
-            <TabsTrigger value="mirror">Mirror</TabsTrigger>
-            <TabsTrigger value="quality">Quality</TabsTrigger>
-            <TabsTrigger value="self-improve">Self-Improve</TabsTrigger>
-            <TabsTrigger value="stargazer">Stargazer</TabsTrigger>
-            <TabsTrigger value="data">Data</TabsTrigger>
-            <TabsTrigger value="forms">Forms</TabsTrigger>
-            <TabsTrigger value="errors">Errors</TabsTrigger>
-            <TabsTrigger value="auth">Auth</TabsTrigger>
-            <TabsTrigger value="more">More...</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-5 lg:grid-cols-10 gap-1 bg-muted/30 p-1 h-auto">
+            <TabsTrigger value="scout" className="text-xs px-2 py-2">
+              <span className="mr-1">👻</span> Scout
+            </TabsTrigger>
+            <TabsTrigger value="mirror" className="text-xs px-2 py-2">
+              <span className="mr-1">🪞</span> Mirror
+            </TabsTrigger>
+            <TabsTrigger value="quality" className="text-xs px-2 py-2">
+              <span className="mr-1">⚡</span> Quality
+            </TabsTrigger>
+            <TabsTrigger value="self-improve" className="text-xs px-2 py-2">
+              <span className="mr-1">🧠</span> Improve
+            </TabsTrigger>
+            <TabsTrigger value="stargazer" className="text-xs px-2 py-2">
+              <span className="mr-1">⭐</span> Stargazer
+            </TabsTrigger>
+            <TabsTrigger value="data" className="text-xs px-2 py-2">
+              <span className="mr-1">📊</span> Data
+            </TabsTrigger>
+            <TabsTrigger value="forms" className="text-xs px-2 py-2">
+              <span className="mr-1">📝</span> Forms
+            </TabsTrigger>
+            <TabsTrigger value="errors" className="text-xs px-2 py-2">
+              <span className="mr-1">🛡️</span> Errors
+            </TabsTrigger>
+            <TabsTrigger value="auth" className="text-xs px-2 py-2">
+              <span className="mr-1">🔐</span> Auth
+            </TabsTrigger>
+            <TabsTrigger value="more" className="text-xs px-2 py-2">
+              <span className="mr-1">➕</span> More
+            </TabsTrigger>
           </TabsList>
 
           {/* Scout Configuration */}
           <TabsContent value="scout" className="space-y-4">
-            <Card>
+            <Card className="border-2 border-violet-500/20 bg-gradient-to-br from-violet-500/5 to-purple-500/5">
               <CardHeader>
-                <CardTitle>👻 Phantom Scout Configuration</CardTitle>
-                <CardDescription>GitHub intelligence gathering settings</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="scout-enabled">Enable Scout</Label>
+                <div className="flex items-center gap-3">
+                  <div className="text-3xl">👻</div>
+                  <div className="flex-1">
+                    <CardTitle className="text-xl">Phantom Scout Configuration</CardTitle>
+                    <CardDescription className="mt-1">
+                      Automated GitHub intelligence gathering & Blue Ocean opportunity discovery
+                    </CardDescription>
+                  </div>
                   <Switch
-                    id="scout-enabled"
                     checked={scout.enabled}
                     onCheckedChange={(checked) => updateScoutConfig({ enabled: checked })}
+                    className="ml-auto"
                   />
                 </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="scout-niche">Target Niche</Label>
-                  <Input
-                    id="scout-niche"
-                    value={scout.targetNiche}
-                    onChange={(e) => updateScoutConfig({ targetNiche: e.target.value })}
-                    placeholder="e.g., developer-tools, react-native"
-                  />
+              </CardHeader>
+              <CardContent className="space-y-5">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="scout-niche" className="flex items-center gap-2">
+                      🎯 Target Niche
+                    </Label>
+                    <Input
+                      id="scout-niche"
+                      value={scout.targetNiche}
+                      onChange={(e) => updateScoutConfig({ targetNiche: e.target.value })}
+                      placeholder="e.g., developer-tools, react-native"
+                      className="glass-panel"
+                    />
+                    <p className="text-xs text-muted-foreground">The market segment to analyze</p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="scout-depth" className="flex items-center gap-2">
+                      🔍 Scan Depth
+                    </Label>
+                    <Select value={scout.depth} onValueChange={(value: 'shallow' | 'normal' | 'deep') => updateScoutConfig({ depth: value })}>
+                      <SelectTrigger id="scout-depth" className="glass-panel">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="shallow">⚡ Shallow (Fast - 30s)</SelectItem>
+                        <SelectItem value="normal">🎯 Normal (Balanced - 2min)</SelectItem>
+                        <SelectItem value="deep">🔬 Deep (Thorough - 5min)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <p className="text-xs text-muted-foreground">Analysis depth vs speed trade-off</p>
+                  </div>
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="scout-min-stars">Minimum Stars</Label>
-                  <Input
-                    id="scout-min-stars"
-                    type="number"
-                    value={scout.minStars}
-                    onChange={(e) => updateScoutConfig({ minStars: parseInt(e.target.value) })}
-                  />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="scout-min-stars" className="flex items-center gap-2">
+                      ⭐ Minimum Stars
+                    </Label>
+                    <Input
+                      id="scout-min-stars"
+                      type="number"
+                      value={scout.minStars}
+                      onChange={(e) => updateScoutConfig({ minStars: parseInt(e.target.value) })}
+                      className="glass-panel"
+                      min="0"
+                    />
+                    <p className="text-xs text-muted-foreground">Filter out low-quality repos</p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="scout-max-repos" className="flex items-center gap-2">
+                      📊 Maximum Repositories
+                    </Label>
+                    <Input
+                      id="scout-max-repos"
+                      type="number"
+                      value={scout.maxRepos}
+                      onChange={(e) => updateScoutConfig({ maxRepos: parseInt(e.target.value) })}
+                      className="glass-panel"
+                      min="1"
+                      max="200"
+                    />
+                    <p className="text-xs text-muted-foreground">Cap analysis to avoid rate limits</p>
+                  </div>
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="scout-max-repos">Maximum Repositories</Label>
-                  <Input
-                    id="scout-max-repos"
-                    type="number"
-                    value={scout.maxRepos}
-                    onChange={(e) => updateScoutConfig({ maxRepos: parseInt(e.target.value) })}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="scout-depth">Scan Depth</Label>
-                  <Select value={scout.depth} onValueChange={(value: 'shallow' | 'normal' | 'deep') => updateScoutConfig({ depth: value })}>
-                    <SelectTrigger id="scout-depth">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="shallow">Shallow (Fast)</SelectItem>
-                      <SelectItem value="normal">Normal (Balanced)</SelectItem>
-                      <SelectItem value="deep">Deep (Thorough)</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="scout-schedule">Cron Schedule</Label>
-                  <Input
-                    id="scout-schedule"
-                    value={scout.schedule}
-                    onChange={(e) => updateScoutConfig({ schedule: e.target.value })}
-                    placeholder="0 6 * * *"
-                  />
-                  <p className="text-xs text-muted-foreground">Daily at 6 AM UTC</p>
+                <div className="space-y-2 pt-2 border-t border-border/50">
+                  <Label htmlFor="scout-schedule" className="flex items-center gap-2">
+                    ⏰ Automation Schedule (Cron)
+                  </Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="scout-schedule"
+                      value={scout.schedule}
+                      onChange={(e) => updateScoutConfig({ schedule: e.target.value })}
+                      placeholder="0 6 * * *"
+                      className="glass-panel flex-1"
+                    />
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="glass-panel"
+                      onClick={() => updateScoutConfig({ schedule: '0 6 * * *' })}
+                    >
+                      Reset
+                    </Button>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <span className="inline-block w-2 h-2 rounded-full bg-green-500"></span>
+                    <span>Daily at 6 AM UTC • Next run in ~12 hours</span>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -666,16 +729,20 @@ export const FeatureConfigModal: React.FC<FeatureConfigModalProps> = ({ isOpen, 
           </TabsContent>
         </Tabs>
 
-        <DialogFooter className="flex justify-between">
-          <Button variant="outline" onClick={handleReset}>
-            Reset to Defaults
+        <DialogFooter className="flex flex-col sm:flex-row justify-between gap-3 pt-4 border-t">
+          <Button 
+            variant="outline" 
+            onClick={handleReset}
+            className="glass-panel border-destructive/20 text-destructive hover:bg-destructive/10"
+          >
+            🔄 Reset to Defaults
           </Button>
           <div className="flex gap-2">
-            <Button variant="ghost" onClick={onClose}>
+            <Button variant="ghost" onClick={onClose} className="glass-panel">
               Cancel
             </Button>
-            <Button onClick={handleSave}>
-              Save Configuration
+            <Button onClick={handleSave} className="bg-gradient-to-r from-violet-500 to-fuchsia-500 hover:from-violet-600 hover:to-fuchsia-600">
+              💾 Save Configuration
             </Button>
           </div>
         </DialogFooter>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDashboardStore } from '../store/dashboard-store';
 import { MetricCard } from './MetricCard';
 import { DecisionTimeline } from './DecisionTimeline';
@@ -35,8 +35,18 @@ const DATE_RANGES = {
 };
 
 export const DashboardLayout: React.FC = () => {
-  const { metrics, setDateRange } = useDashboardStore();
+  const { metrics, setDateRange, clearAllData, recentDecisions, loadDecisions } = useDashboardStore();
   const [selectedRange, setSelectedRange] = useState<keyof typeof DATE_RANGES>('30d');
+
+  // Check if we have any data to display
+  const hasData = recentDecisions.length > 0 || metrics.totalDecisions > 0;
+
+  // Load dashboard data on mount
+  useEffect(() => {
+    loadDecisions().catch((error) => {
+      console.error('[DashboardLayout] Failed to load decisions:', error);
+    });
+  }, [loadDecisions]);
 
   const handleDateRangeChange = (value: string) => {
     setSelectedRange(value as keyof typeof DATE_RANGES);
@@ -47,45 +57,55 @@ export const DashboardLayout: React.FC = () => {
       setDateRange(new Date(0), new Date());
     } else {
       const end = new Date();
-        <div className="flex items-center gap-2">
-          <Calendar className="h-4 w-4 text-muted-foreground" />
-          <Select value={selectedRange} onValueChange={handleDateRangeChange}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {Object.entries(DATE_RANGES).map(([key, { label }]) => (
-                <SelectItem key={key} value={key}>
-                  {label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleClearData}
-            className="text-destructive hover:bg-destructive/10"
-          >
-            <Trash2 className="h-4 w-4 mr-2" />
-            Clear Data
-          </Button>
-        </div>
       const start = new Date(Date.now() - range.days * 24 * 60 * 60 * 1000);
       setDateRange(start, end);
+    }
+  };
+
+  const handleClearData = async () => {
+    if (confirm('Are you sure you want to clear all analytics data? This cannot be undone.')) {
+      await clearAllData();
     }
   };
 
   return (
     <div className="container mx-auto px-4 py-6 space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gradient">Council Analytics</h1>
-          <p className="text-muted-foreground mt-1">
-            Insights from your AI council decisions
+          <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-violet-400 via-fuchsia-400 to-pink-400 bg-clip-text text-transparent">
+            Council Analytics
+          </h1>
+          <p className="text-muted-foreground mt-2 text-sm md:text-base">
+            Insights from your AI council decisions • {hasData ? `${metrics.totalDecisions} total decisions` : 'No data yet'}
           </p>
         </div>
+        {hasData && (
+          <div className="flex items-center gap-2 flex-wrap">
+            <Calendar className="h-4 w-4 text-muted-foreground" />
+            <Select value={selectedRange} onValueChange={handleDateRangeChange}>
+              <SelectTrigger className="w-[160px] glass-panel">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.entries(DATE_RANGES).map(([key, { label }]) => (
+                  <SelectItem key={key} value={key}>
+                    {label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleClearData}
+              className="text-destructive hover:bg-destructive/10 glass-panel"
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              Clear Data
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Metrics Grid */}
@@ -121,14 +141,26 @@ export const DashboardLayout: React.FC = () => {
           />
         </div>
       ) : (
-        <Card className="glass-panel border-2 border-dashed">
-          <CardContent className="flex flex-col items-center justify-center py-16">
-            <Brain className="h-16 w-16 text-muted-foreground/50 mb-4" />
-            <h3 className="text-xl font-semibold mb-2">No Analytics Data Yet</h3>
-            <p className="text-muted-foreground text-center max-w-md mb-6">
-              Execute your first Council analysis to start tracking metrics, costs, and performance insights.
+        <Card className="glass-panel border-2 border-dashed border-violet-500/30 bg-gradient-to-br from-violet-500/5 to-purple-500/5">
+          <CardContent className="flex flex-col items-center justify-center py-20">
+            <div className="relative mb-6">
+              <Brain className="h-20 w-20 text-violet-500/50" />
+              <div className="absolute inset-0 animate-ping">
+                <Brain className="h-20 w-20 text-violet-500/20" />
+              </div>
+            </div>
+            <h3 className="text-2xl font-bold mb-3 bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
+              No Analytics Data Yet
+            </h3>
+            <p className="text-muted-foreground text-center max-w-md mb-8 leading-relaxed">
+              Execute your first Council analysis to start tracking metrics, costs, and performance insights. 
+              Your analytics journey begins with a single question.
             </p>
-            <Button onClick={() => window.location.href = '/'}>
+            <Button 
+              onClick={() => window.location.href = '/'} 
+              className="bg-gradient-to-r from-violet-500 to-fuchsia-500 hover:from-violet-600 hover:to-fuchsia-600 text-white font-semibold px-6 py-6 text-base"
+            >
+              <Brain className="mr-2 h-5 w-5" />
               Go to Council
             </Button>
           </CardContent>

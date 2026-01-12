@@ -20,15 +20,7 @@ console.log("[MAIN] Initializing database...");
 initDatabase()
   .then(() => {
     console.log("[MAIN] Database initialized successfully");
-    // Load dashboard data after database is ready
-    import("@/features/dashboard/store/dashboard-store")
-      .then((mod) => {
-        mod.useDashboardStore.getState().loadDecisions();
-        console.log("[MAIN] Dashboard data loaded");
-      })
-      .catch((error) => {
-        console.error("[MAIN] Failed to load dashboard data:", error);
-      });
+    // Dashboard will load its own data when mounted
   })
   .catch((error) => {
     console.error("[MAIN] Failed to initialize database:", error);

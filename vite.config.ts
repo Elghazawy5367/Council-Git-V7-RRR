@@ -14,7 +14,7 @@ export default defineConfig(({ mode }) => {
     base: mode === 'production' ? '/Council-Git-V7-RRR/' : '/',
     server: {
       host: "0.0.0.0",
-      port: 8000,
+      port: 5173,
       strictPort: false,
       allowedHosts: true,
       cors: true,
@@ -22,7 +22,7 @@ export default defineConfig(({ mode }) => {
       hmr: {
         overlay: true, // Show errors as overlay instead of crashing
         timeout: 30000, // Increase timeout for slower connections
-        clientPort: isCodespaces ? 443 : 8000,
+        clientPort: isCodespaces ? 443 : 5173,
       },
       watch: {
         // Reduce file watching overhead
@@ -32,13 +32,10 @@ export default defineConfig(({ mode }) => {
   plugins: [
     react(), 
     tsconfigPaths(),
-    // Check TypeScript and ESLint errors in real-time during dev
-    // Disabled for production builds to allow deployment
+    // Check TypeScript errors in real-time during dev
+    // ESLint checker disabled due to configuration incompatibility
     mode === 'development' && checker({
       typescript: true,
-      eslint: {
-        lintCommand: 'eslint "./src/**/*.{ts,tsx}"',
-      },
       overlay: {
         initialIsOpen: false,
       },

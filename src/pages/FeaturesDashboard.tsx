@@ -157,19 +157,26 @@ const FeaturesDashboard: React.FC = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="glass-panel border-b border-border/50 sticky top-0 z-50">
+      <header className="glass-panel border-b border-border/50 sticky top-0 z-50 backdrop-blur-xl">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Button variant="ghost" size="icon" onClick={() => navigate('/')}>
+              <Button variant="ghost" size="icon" onClick={() => navigate('/')} className="hover:bg-violet-500/10">
                 <ArrowLeft className="h-5 w-5" />
               </Button>
               <div>
-                <h1 className="text-xl font-bold text-gradient">Feature Control Center</h1>
-                <p className="text-xs text-muted-foreground">Run and manage core features</p>
+                <h1 className="text-xl font-bold bg-gradient-to-r from-violet-400 via-fuchsia-400 to-pink-400 bg-clip-text text-transparent">
+                  Feature Control Center
+                </h1>
+                <p className="text-xs text-muted-foreground">Run and manage core features • {features.filter(f => f.status === 'active').length} active</p>
               </div>
             </div>
-            <Button variant="outline" size="sm" onClick={() => setShowConfigModal(true)} className="gap-2">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => setShowConfigModal(true)} 
+              className="gap-2 glass-panel border-violet-500/20 hover:bg-violet-500/10"
+            >
               <Settings className="h-4 w-4" />
               Configure Features
             </Button>
@@ -186,18 +193,17 @@ const FeaturesDashboard: React.FC = () => {
           {/* Features List */}
           <div className="space-y-4">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-semibold">Core Features</h2>
-              <Badge variant="outline" className="gap-2">
+              <h2 className="text-2xl font-semibold bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
+                Core Features
+              </h2>
+              <Badge variant="outline" className="gap-2 glass-panel">
                 <Github className="h-4 w-4" />
                 Powered by GitHub Actions
               </Badge>
             </div>
             
             {features.map((feature) => (
-              <Card key={feature.id} className="hover:shadow-lg transition-shadow">
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-3">
+              <Card key={feature.id} className="hover:shadow-xl hover:scale-[1.02] transition-all glass-panel border-2 border-violet-500/10">\n                <CardHeader>\n                  <div className="flex items-start justify-between">\n                    <div className="flex items-center gap-3">
                       <span className="text-3xl">{feature.icon}</span>
                       <div>
                         <CardTitle className="text-lg">{feature.name}</CardTitle>
@@ -256,34 +262,46 @@ const FeaturesDashboard: React.FC = () => {
             ))}
           </div>
 
-          {/* Info Panel */}
+            {/* Info Panel */}
           <div className="space-y-4">
-            <Card className="bg-gradient-to-br from-primary/5 to-secondary/5">
+            <Card className="bg-gradient-to-br from-violet-500/10 via-purple-500/5 to-fuchsia-500/10 border-2 border-violet-500/20 glass-panel">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Github className="h-5 w-5" />
+                <CardTitle className="flex items-center gap-2 text-xl">
+                  <Github className="h-6 w-6 text-violet-500" />
                   GitHub Actions Integration
                 </CardTitle>
-                <CardDescription>Zero-cost automated intelligence</CardDescription>
+                <CardDescription className="text-base">Zero-cost automated intelligence</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <h4 className="font-medium text-sm">How It Works</h4>
-                  <ul className="text-sm text-muted-foreground space-y-1 pl-4">
-                    <li className="list-disc">✨ Features run automatically on schedule</li>
-                    <li className="list-disc">🚀 Trigger workflows manually anytime</li>
-                    <li className="list-disc">💾 Results stored in repository</li>
-                    <li className="list-disc">🆓 Completely free using GitHub Actions</li>
+                  <h4 className="font-semibold text-sm">How It Works</h4>
+                  <ul className="text-sm text-muted-foreground space-y-2">
+                    <li className="flex items-center gap-2">
+                      <span className="text-lg">✨</span>
+                      Features run automatically on schedule
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="text-lg">🚀</span>
+                      Trigger workflows manually anytime
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="text-lg">💾</span>
+                      Results stored in repository
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="text-lg">🆓</span>
+                      Completely free using GitHub Actions
+                    </li>
                   </ul>
                 </div>
                 
-                <div className="p-3 bg-background rounded-lg border">
-                  <h4 className="font-medium text-sm mb-2">Quick Actions</h4>
+                <div className="p-3 bg-background/50 rounded-lg border border-violet-500/20">
+                  <h4 className="font-semibold text-sm mb-2">Quick Actions</h4>
                   <div className="space-y-2">
                     <Button 
                       variant="ghost" 
                       size="sm" 
-                      className="w-full justify-start"
+                      className="w-full justify-start hover:bg-violet-500/10"
                       onClick={() => window.open(`https://github.com/${repoOwner}/${repoName}/actions`, '_blank')}
                     >
                       <Github className="h-4 w-4 mr-2" />
@@ -292,7 +310,7 @@ const FeaturesDashboard: React.FC = () => {
                     <Button 
                       variant="ghost" 
                       size="sm" 
-                      className="w-full justify-start"
+                      className="w-full justify-start hover:bg-violet-500/10"
                       onClick={() => navigate('/quality')}
                     >
                       📊 Quality Dashboard
@@ -302,16 +320,16 @@ const FeaturesDashboard: React.FC = () => {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="glass-panel border-2 border-violet-500/10">
               <CardHeader>
-                <CardTitle>Latest Results</CardTitle>
+                <CardTitle className="text-lg">Latest Results</CardTitle>
                 <CardDescription>Access generated reports and data</CardDescription>
               </CardHeader>
               <CardContent className="space-y-2">
                 <Button 
                   variant="outline" 
                   size="sm" 
-                  className="w-full justify-start"
+                  className="w-full justify-start glass-panel hover:bg-violet-500/10"
                   onClick={() => window.open('/data/intelligence/latest.md', '_blank')}
                 >
                   📄 Scout Intelligence Report
@@ -319,7 +337,7 @@ const FeaturesDashboard: React.FC = () => {
                 <Button 
                   variant="outline" 
                   size="sm" 
-                  className="w-full justify-start"
+                  className="w-full justify-start glass-panel hover:bg-violet-500/10"
                   onClick={() => window.open('/data/opportunities/latest.json', '_blank')}
                 >
                   🎯 Blue Ocean Opportunities
@@ -327,7 +345,7 @@ const FeaturesDashboard: React.FC = () => {
                 <Button 
                   variant="outline" 
                   size="sm" 
-                  className="w-full justify-start"
+                  className="w-full justify-start glass-panel hover:bg-violet-500/10"
                   onClick={() => window.open('/attached_assets/', '_blank')}
                 >
                   🪞 Mirror Reports
@@ -335,7 +353,7 @@ const FeaturesDashboard: React.FC = () => {
                 <Button 
                   variant="outline" 
                   size="sm" 
-                  className="w-full justify-start"
+                  className="w-full justify-start glass-panel hover:bg-violet-500/10"
                   onClick={() => window.open('/src/lib/knowledge-base/', '_blank')}
                 >
                   🧠 Learned Patterns
