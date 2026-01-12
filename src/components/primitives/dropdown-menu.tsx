@@ -162,8 +162,10 @@ DropdownMenuShortcut.displayName = "DropdownMenuShortcut";
 
 import { useFeatureConfigStore } from "@/features/council/store/feature-config-store";
 import FeatureConfigModal from "@/features/council/components/FeatureConfigModal";
+import { useNavigate } from "react-router-dom";
 
 const ProjectFeaturesDropdown = () => {
+  const navigate = useNavigate();
   const [showConfigDialog, setShowConfigDialog] = React.useState(false);
   
   const {
@@ -584,12 +586,22 @@ const ProjectFeaturesDropdown = () => {
           <div className="text-xs text-center text-muted-foreground">
             💡 Toggle features on/off · Changes saved instantly
           </div>
-          <button
-            onClick={() => setShowConfigDialog(true)}
-            className="w-full text-xs py-2 px-3 rounded-md bg-primary/10 hover:bg-primary/20 text-primary font-medium transition-colors"
-          >
-            ⚙️ Advanced Configuration
-          </button>
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              onClick={() => {
+                navigate('/features');
+              }}
+              className="text-xs py-2 px-3 rounded-md bg-secondary/10 hover:bg-secondary/20 text-secondary-foreground font-medium transition-colors"
+            >
+              🎯 Features Dashboard
+            </button>
+            <button
+              onClick={() => setShowConfigDialog(true)}
+              className="text-xs py-2 px-3 rounded-md bg-primary/10 hover:bg-primary/20 text-primary font-medium transition-colors"
+            >
+              ⚙️ Advanced Config
+            </button>
+          </div>
         </div>
       </DropdownMenuContent>
       
