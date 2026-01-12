@@ -44,6 +44,23 @@ export const HistoricalView: React.FC = () => {
     toast.success('Decisions exported successfully');
   };
 
+  const handleExportCSV = () => {
+    const csvHeader = 'Date,Mode,Task,Experts,Duration (s),Cost ($),Success\n';
+    const csvRows = recentDecisions.map((d) => 
+      `"${new Date(d.timestamp).toISOString()}","${d.mode}","${d.task.replace(/"/g, '""')}",${d.expertCount},${d.duration},${d.cost.toFixed(4)},${d.success}`
+    ).join('\n');
+    const csv = csvHeader + csvRows;
+    
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `council-decisions-${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success('CSV exported successfully');
+  };
+
   return (
     <Card className="glass-panel">
       <CardHeader>
@@ -61,7 +78,11 @@ export const HistoricalView: React.FC = () => {
             </div>
             <Button variant="outline" size="sm" onClick={handleExport}>
               <Download className="h-4 w-4 mr-2" />
-              Export
+              JSON
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleExportCSV}>
+              <Download className="h-4 w-4 mr-2" />
+              CSV
             </Button>
           </div>
         </div>

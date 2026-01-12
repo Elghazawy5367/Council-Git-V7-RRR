@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import type { ExecutionMode } from '@/features/council/lib/types';
+import { db, type DecisionRecord as DBDecisionRecord } from '@/lib/db';
 
 export interface DecisionMetrics {
   totalDecisions: number;
@@ -11,7 +12,7 @@ export interface DecisionMetrics {
 }
 
 export interface DecisionRecord {
-  id: string;
+  id?: number;
   timestamp: Date;
   mode: ExecutionMode;
   task: string;
@@ -20,6 +21,8 @@ export interface DecisionRecord {
   cost: number; // USD
   verdict: string;
   synthesisContent?: string;
+  synthesisModel?: string;
+  synthesisTier?: string;
   success: boolean;
 }
 
@@ -30,10 +33,13 @@ interface DashboardState {
     start: Date;
     end: Date;
   };
+  isLoading: boolean;
   setDateRange: (start: Date, end: Date) => void;
-  addDecisionRecord: (record: DecisionRecord) => void;
+  addDecisionRecord: (record: DecisionRecord) => Promise<void>;
+  loadDecisions: () => Promise<void>;
   updateMetrics: () => void;
   exportData: () => string;
+  clearAllData: () => Promise<void>;
 }
 
 const calculateMetrics = (decisions: DecisionRecord[]): DecisionMetrics => {
@@ -87,6 +93,7 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
     },
   },
   recentDecisions: [],
+  isLoading: false,
   dateRange: {
     start: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // 30 days ago
     end: new Date(),
@@ -97,11 +104,63 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
     get().updateMetrics();
   },
 
-  addDecisionRecord: (record: DecisionRecord) => {
-    set((state) => ({
-      recentDecisions: [record, ...state.recentDecisions].slice(0, 50), // Keep last 50
-    }));
-    get().updateMetrics();
+  addDecisionRecord: async (record: DecisionRecord) => {
+    try {
+      // Save to IndexedDB
+      const dbRecord: DBDecisionRecord = {
+        timestamp: record.timestamp.getTime(),
+        mode: record.mode,
+        task: record.task,
+        expertCount: record.expertCount,
+        duration: record.duration,
+        cost: record.cost,
+        verdict: record.verdict,
+        synthesisContent: record.synthesisContent,
+        synthesisModel: record.synthesisModel,
+        synthesisTier: record.synthesisTier,
+        success: record.success,
+      };
+      
+      await db.decisionRecords.add(dbRecord);
+      
+      // Reload decisions from DB
+      await get().loadDecisions();
+    } catch (error) {
+      console.error('Failed to save decision record:', error);
+    }
+  },
+
+  loadDecisions: async () => {
+    set({ isLoading: true });
+    try {
+      const records = await db.decisionRecords
+        .orderBy('timestamp')
+        .reverse()
+        .limit(100)
+        .toArray();
+      
+      const decisions: DecisionRecord[] = records.map(r => ({
+        id: r.id,
+        timestamp: new Date(r.timestamp),
+        mode: r.mode as ExecutionMode,
+        task: r.task,
+        expertCount: r.expertCount,
+        duration: r.duration,
+        cost: r.cost,
+        verdict: r.verdict,
+        synthesisContent: r.synthesisContent,
+        synthesisModel: r.synthesisModel,
+        synthesisTier: r.synthesisTier,
+        success: r.success,
+      }));
+      
+      set({ recentDecisions: decisions });
+      get().updateMetrics();
+    } catch (error) {
+      console.error('Failed to load decisions:', error);
+    } finally {
+      set({ isLoading: false });
+    }
   },
 
   updateMetrics: () => {
@@ -116,5 +175,29 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
   exportData: () => {
     const { recentDecisions } = get();
     return JSON.stringify(recentDecisions, null, 2);
+  },
+
+  clearAllData: async () => {
+    try {
+      await db.decisionRecords.clear();
+      set({ 
+        recentDecisions: [],
+        metrics: {
+          totalDecisions: 0,
+          averageTime: 0,
+          averageCost: 0,
+          successRate: 0,
+          expertConsensusRate: 0,
+          modeDistribution: {
+            parallel: 0,
+            consensus: 0,
+            adversarial: 0,
+            sequential: 0,
+          },
+        },
+      });
+    } catch (error) {
+      console.error('Failed to clear data:', error);
+    }
   },
 }));

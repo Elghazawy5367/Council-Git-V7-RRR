@@ -47,16 +47,20 @@ export const SynthesisCard: React.FC = () => {
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-lg">
-              <Sparkles className="w-5 h-5 text-primary-foreground" />
+            <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-amber-500 via-orange-600 to-red-600 flex items-center justify-center shadow-lg ring-2 ring-amber-500/50">
+              <Sparkles className="w-6 h-6 text-white animate-pulse" />
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-foreground">⚖️ The Ruthless Judge</h3>
-              <p className="text-xs text-muted-foreground flex items-center gap-1">
-                <span>{tierConfig.icon}</span>
-                <span>{tierConfig.name}</span>
+              <h3 className="text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-500 via-orange-600 to-red-600">
+                ⚖️ THE RUTHLESS JUDGE
+              </h3>
+              <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
+                <span className="text-base">{tierConfig.icon}</span>
+                <span className="font-semibold">{tierConfig.name}</span>
                 <span className="text-muted-foreground/60">•</span>
                 <span className="truncate">{synthesisConfig.model?.split('/')[1] || 'Default Model'}</span>
+                <span className="text-muted-foreground/60">•</span>
+                <span className="text-xs opacity-60">~{tierConfig.estimatedTime}s</span>
               </p>
             </div>
           </div>

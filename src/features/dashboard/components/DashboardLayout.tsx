@@ -1,12 +1,21 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useDashboardStore } from '../store/dashboard-store';
 import { MetricCard } from './MetricCard';
 import { DecisionTimeline } from './DecisionTimeline';
 import { ModeDistribution } from './ModeDistribution';
 import { CostAnalytics } from './CostAnalytics';
 import { HistoricalView } from './HistoricalView';
+import { ExpertPerformance } from './ExpertPerformance';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/primitives/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/primitives/tabs';
+import { Button } from '@/components/primitives/button';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/primitives/select';
 import {
   Brain,
   Clock,
@@ -14,10 +23,58 @@ import {
   TrendingUp,
   Target,
   BarChart3,
+  Calendar,
+  Trash2,
 } from 'lucide-react';
 
+const DATE_RANGES = {
+  '7d': { label: 'Last 7 days', days: 7 },
+  '30d': { label: 'Last 30 days', days: 30 },
+  '90d': { label: 'Last 90 days', days: 90 },
+  'all': { label: 'All time', days: null },
+};
+
 export const DashboardLayout: React.FC = () => {
-  const { metrics } = useDashboardStore();
+  const { metrics, setDateRange } = useDashboardStore();
+  const [selectedRange, setSelectedRange] = useState<keyof typeof DATE_RANGES>('30d');
+
+  const handleDateRangeChange = (value: string) => {
+    setSelectedRange(value as keyof typeof DATE_RANGES);
+    const range = DATE_RANGES[value as keyof typeof DATE_RANGES];
+    
+    if (range.days === null) {
+      // All time
+      setDateRange(new Date(0), new Date());
+    } else {
+      const end = new Date();
+        <div className="flex items-center gap-2">
+          <Calendar className="h-4 w-4 text-muted-foreground" />
+          <Select value={selectedRange} onValueChange={handleDateRangeChange}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {Object.entries(DATE_RANGES).map(([key, { label }]) => (
+                <SelectItem key={key} value={key}>
+                  {label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleClearData}
+            className="text-destructive hover:bg-destructive/10"
+          >
+            <Trash2 className="h-4 w-4 mr-2" />
+            Clear Data
+          </Button>
+        </div>
+      const start = new Date(Date.now() - range.days * 24 * 60 * 60 * 1000);
+      setDateRange(start, end);
+    }
+  };
 
   return (
     <div className="container mx-auto px-4 py-6 space-y-6">
@@ -103,6 +160,7 @@ export const DashboardLayout: React.FC = () => {
               </CardContent>
             </Card>
           </div>
+          <ExpertPerformance />
         </TabsContent>
 
         <TabsContent value="timeline">

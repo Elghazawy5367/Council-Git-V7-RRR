@@ -5,6 +5,7 @@ import Dexie, { type Table } from "dexie";
  * 
  * Version 1: Initial schema with experts and sessions
  * Version 2: Added 'persona' field to experts, transformed existing data
+ * Version 3: Added decisionRecords table for analytics dashboard
  */
 
 export interface Expert {
@@ -22,9 +23,26 @@ export interface Session {
   createdAt: number;
 }
 
+export interface DecisionRecord {
+  id?: number;
+  timestamp: number;
+  mode: string;
+  task: string;
+  expertCount: number;
+  duration: number; // seconds
+  cost: number; // USD
+  verdict: string;
+  synthesisContent?: string;
+  synthesisModel?: string;
+  synthesisTier?: string;
+  success: boolean;
+  outputs?: string; // JSON stringified expert outputs
+}
+
 export class CouncilDatabase extends Dexie {
   experts!: Table<Expert>;
   sessions!: Table<Session>;
+  decisionRecords!: Table<DecisionRecord>;
 
   constructor() {
     super("CouncilDB");
@@ -48,6 +66,14 @@ export class CouncilDatabase extends Dexie {
             expert.persona = `Specialist in ${expert.role}`;
           }
         });
+      });
+
+    // VERSION 3: Add decision records for analytics
+    this.version(3)
+      .stores({
+        experts: "++id, name, role, model, persona",
+        sessions: "++id, title, createdAt",
+        decisionRecords: "++id, timestamp, mode, task, success", // Add analytics table
       });
   }
 }

@@ -10,6 +10,7 @@ import { UseMutationResult } from '@tanstack/react-query';
 const getControlPanelStore = () => import('./control-panel-store').then(mod => mod.useControlPanelStore);
 const getExpertStore = () => import('./expert-store').then(mod => mod.useExpertStore);
 const getSettingsStore = () => import('@/features/settings/store/settings-store').then(mod => mod.useSettingsStore);
+const getDashboardStore = () => import('@/features/dashboard/store/dashboard-store').then(mod => mod.useDashboardStore);
 
 export interface ExpertOutput {
   name: string;
@@ -48,10 +49,13 @@ export const useExecutionStore = create<ExecutionState>((set) => ({
 
   executeCouncil: async (synthesisMutation) => {
     // Use async imports to prevent circular dependencies
+    const startTime = Date.now();
+    
     try {
       const controlPanelStore = await getControlPanelStore();
       const expertStore = await getExpertStore();
       const settingsStore = await getSettingsStore();
+      const dashboardStore = await getDashboardStore();
       
       const { task, mode, activeExpertCount } = controlPanelStore.getState();
       const { experts, updateExpert } = expertStore.getState();
@@ -182,15 +186,19 @@ export const useExecutionStore = create<ExecutionState>((set) => ({
         },
         {
           onSuccess: (result) => {
-            const newSynthesisCost = result.cost;
+            const totalCost = expertsCost + newSynthesisCost;
+            const duration = Math.round((Date.now() - startTime) / 1000); // seconds
+            
             set({ 
               synthesisResult: result, 
               verdict: result.content,
               statusMessage: 'Analysis complete'
             });
             set(() => ({
-              cost: { experts: expertsCost, synthesis: newSynthesisCost, total: expertsCost + newSynthesisCost },
+              cost: { experts: expertsCost, synthesis: newSynthesisCost, total: totalCost },
             }));
+            
+            // Save to session history
             saveSession({
               task,
               mode,
@@ -199,8 +207,24 @@ export const useExecutionStore = create<ExecutionState>((set) => ({
               outputs: Object.fromEntries(Object.entries(collectedOutputs).map(([id, data]) => [id, data.output])),
               verdict: result.content,
               synthesisConfig,
-              cost: { experts: expertsCost, synthesis: newSynthesisCost, total: expertsCost + newSynthesisCost },
+              cost: { experts: expertsCost, synthesis: newSynthesisCost, total: totalCost },
             });
+            
+            // Track in dashboard analytics
+            dashboardStore.getState().addDecisionRecord({
+              timestamp: new Date(),
+              mode,
+              task: task.substring(0, 200), // Truncate for storage
+              expertCount: activeExpertCount,
+              duration,
+              cost: totalCost,
+              verdict: result.content.substring(0, 500), // Truncate for storage
+              synthesisContent: result.content,
+              synthesisModel: result.model,
+              synthesisTier: result.tier,
+              success: true,
+            }).catch(err => console.error('Failed to save decision record:', err));
+            
             set({ isSynthesizing: false });
             toast.success('Council analysis complete!');
           },
