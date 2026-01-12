@@ -99,7 +99,32 @@ This project is built with:
 
 ## How can I deploy this project?
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+### 🚀 Deployment Options
+
+#### GitHub Pages (Automated)
+Automatically deployed on every push to `main`:
+
+```bash
+# Manual deployment
+npm run deploy
+```
+
+**Live URL:** https://Elghazawy5367.github.io/Council-Git-V7-RRR/
+
+#### Vercel (Recommended)
+1. Visit [vercel.com](https://vercel.com)
+2. Import repository: `Elghazawy5367/Council-Git-V7-RRR`
+3. Deploy automatically
+
+**Configuration:**
+- Build Command: `npm run build`
+- Output Directory: `dist`
+- Framework: Vite
+
+#### Lovable Platform
+Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share → Publish.
+
+📖 **Full Deployment Guide:** See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed instructions, troubleshooting, and configuration.
 
 ## Can I connect a custom domain to my Lovable project?
 

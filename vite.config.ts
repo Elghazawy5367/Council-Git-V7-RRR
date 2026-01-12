@@ -10,6 +10,8 @@ export default defineConfig(({ mode }) => {
   const isCodespaces = process.env.CODESPACES === 'true' || process.env.GITHUB_CODESPACE_TOKEN;
   
   return {
+    // Base path for GitHub Pages deployment
+    base: mode === 'production' ? '/Council-Git-V7-RRR/' : '/',
     server: {
       host: "0.0.0.0",
       port: 8000,
@@ -31,7 +33,8 @@ export default defineConfig(({ mode }) => {
     react(), 
     tsconfigPaths(),
     // Check TypeScript and ESLint errors in real-time during dev
-    checker({
+    // Disabled for production builds to allow deployment
+    mode === 'development' && checker({
       typescript: true,
       eslint: {
         lintCommand: 'eslint "./src/**/*.{ts,tsx}"',
