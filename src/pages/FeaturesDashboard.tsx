@@ -171,15 +171,26 @@ const FeaturesDashboard: React.FC = () => {
                 <p className="text-xs text-muted-foreground">Run and manage core features • {features.filter(f => f.status === 'active').length} active</p>
               </div>
             </div>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={() => setShowConfigModal(true)} 
-              className="gap-2 glass-panel border-violet-500/20 hover:bg-violet-500/10"
-            >
-              <Settings className="h-4 w-4" />
-              Configure Features
-            </Button>
+            <div className="flex gap-2">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => navigate('/automation')} 
+                className="gap-2 glass-panel border-green-500/20 hover:bg-green-500/10"
+              >
+                <span className="text-lg">🤖</span>
+                Intelligence Automation
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => setShowConfigModal(true)} 
+                className="gap-2 glass-panel border-violet-500/20 hover:bg-violet-500/10"
+              >
+                <Settings className="h-4 w-4" />
+                Configure Features
+              </Button>
+            </div>
           </div>
         </div>
       </header>

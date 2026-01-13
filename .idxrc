@@ -1,0 +1,53 @@
+{
+  "workspace": {
+    "installDevTools": false
+  },
+  "nix": {
+    "channel": "stable-22.11"
+  },
+  "dev": {
+    "extensions": [
+      "charliermarsh.ruff",
+      "esbenp.prettier-vscode",
+      "dbaeumer.vscode-eslint"
+    ],
+    "tasks": [
+      {
+        "label": "install",
+        "type": "shell",
+        "command": "npm",
+        "args": ["install"]
+      },
+      {
+        "label": "dev",
+        "type": "shell",
+        "command": "npm",
+        "args": ["run", "dev"]
+      },
+      {
+        "label": "build",
+        "type": "shell",
+        "command": "npm",
+        "args": ["run", "build"]
+      },
+      {
+        "label": "preview",
+        "type": "shell",
+        "command": "npm",
+        "args": ["run", "preview"]
+      }
+    ],
+    "ports": [
+      {
+        "port": 5173,
+        "description": "Vite Dev Server",
+        "visibility": "public"
+      },
+      {
+        "port": 4173,
+        "description": "Preview Server",
+        "visibility": "public"
+      }
+    ]
+  }
+}

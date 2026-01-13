@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useDashboardStore } from '../store/dashboard-store';
 import { MetricCard } from './MetricCard';
 import { DecisionTimeline } from './DecisionTimeline';
@@ -35,18 +35,11 @@ const DATE_RANGES = {
 };
 
 export const DashboardLayout: React.FC = () => {
-  const { metrics, setDateRange, clearAllData, recentDecisions, loadDecisions } = useDashboardStore();
+  const { metrics, setDateRange, clearAllData, recentDecisions } = useDashboardStore();
   const [selectedRange, setSelectedRange] = useState<keyof typeof DATE_RANGES>('30d');
 
   // Check if we have any data to display
   const hasData = recentDecisions.length > 0 || metrics.totalDecisions > 0;
-
-  // Load dashboard data on mount
-  useEffect(() => {
-    loadDecisions().catch((error) => {
-      console.error('[DashboardLayout] Failed to load decisions:', error);
-    });
-  }, [loadDecisions]);
 
   const handleDateRangeChange = (value: string) => {
     setSelectedRange(value as keyof typeof DATE_RANGES);
